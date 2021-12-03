@@ -420,12 +420,12 @@ class AccountMove(models.Model):
                             factura.fel_serie = retorno_certificacion_json["serie"]
                             factura.fel_numero = retorno_certificacion_json["numero"]
                             factura.fel_documento_certificado = "https://report.feel.com.gt/ingfacereport/ingfacereport_documento?uuid="+retorno_certificacion_json["uuid"]
-                            return super(AccountMove, self)._post()
                         else:
                             raise UserError(str(retorno_certificacion_json))
                 else:
                     raise UserError(str(retorno_certificacion_json))
 
+        return super(AccountMove, self)._post()
 
 
     def button_draft(self):
