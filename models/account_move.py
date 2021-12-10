@@ -406,7 +406,7 @@ class AccountMove(models.Model):
                         headers = {
                             "USUARIO": str(factura.company_id.fel_usuario),
                             "LLAVE": str(factura.company_id.fel_llave_firma),
-                            "IDENTIFICADOR": str(factura.journal_id.name)+'/'+str(factura.number),
+                            "IDENTIFICADOR": str(factura.journal_id.name)+'/'+str(factura.payment_reference) if factura.payment_reference else str(factura.journal_id.name)+'/'+str(factura.id),
                             "Content-Type": "application/json",
                         }
 
