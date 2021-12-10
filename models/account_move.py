@@ -362,6 +362,16 @@ class AccountMove(models.Model):
                                 TagNitCliente.text = factura.partner_id.vat.replace('-','')
                             else:
                                 TagNitCliente.text = factura.partner_id.vat
+                # if factura.narration:
+                #     TagAdenda = etree.SubElement(TagDTE, DTE_NS+"Adenda",{})
+                #     TagDECER = etree.SubElement(TagAdenda,"DECertificador",{})
+                #     TagDECER.text = str(factura.narration)
+
+                # if factura.narration:
+                #     TagAdenda = etree.SubElement(TagSAT,DTE_NS+"Adenda",{})
+                #     TagComentario = etree.SubElement(TagAdenda, DTE_NS+"Comentario",{})
+                #     TagComentario.text = factura.narration
+
 
                 xmls = etree.tostring(GTDocumento, encoding="UTF-8")
                 xmls = xmls.decode("utf-8").replace("&amp;", "&").encode("utf-8")
@@ -396,7 +406,7 @@ class AccountMove(models.Model):
                         headers = {
                             "USUARIO": str(factura.company_id.fel_usuario),
                             "LLAVE": str(factura.company_id.fel_llave_firma),
-                            "IDENTIFICADOR": str(factura.journal_id.name)+'/'+str(factura.id),
+                            "IDENTIFICADOR": str(factura.journal_id.name)+'/'+str(factura.number),
                             "Content-Type": "application/json",
                         }
 
@@ -416,7 +426,7 @@ class AccountMove(models.Model):
                         logging.warn(retorno_certificacion_json)
                         if retorno_certificacion_json['resultado']:
                             factura.fel_numero_autorizacion = retorno_certificacion_json["uuid"]
-                            factura.name = str(retorno_certificacion_json["serie"])+"/"+str(retorno_certificacion_json["numero"])
+                            # factura.name = str(retorno_certificacion_json["serie"])+"/"+str(retorno_certificacion_json["numero"])
                             factura.fel_serie = retorno_certificacion_json["serie"]
                             factura.fel_numero = retorno_certificacion_json["numero"]
                             factura.fel_documento_certificado = "https://report.feel.com.gt/ingfacereport/ingfacereport_documento?uuid="+retorno_certificacion_json["uuid"]
