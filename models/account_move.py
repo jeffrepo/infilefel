@@ -372,7 +372,6 @@ class AccountMove(models.Model):
                 #     TagComentario = etree.SubElement(TagAdenda, DTE_NS+"Comentario",{})
                 #     TagComentario.text = factura.narration
 
-
                 xmls = etree.tostring(GTDocumento, encoding="UTF-8")
                 xmls = xmls.decode("utf-8").replace("&amp;", "&").encode("utf-8")
                 xmls_base64 = base64.b64encode(xmls)
