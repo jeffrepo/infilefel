@@ -72,13 +72,14 @@
                         <p><strong><center>SUJETO A PAGOS TRIMESTRALES</center></strong></p>
                         <!-- <div class="barcode">
                             <center><img alt="Barcode" t-att-src="'/report/barcode/?type=QR&amp;value=%s&amp;width=180&amp;height=180'
-                              % quote_plus('https://felgtaws.digifact.com.gt/guest/api/FEL?' + keep_query(DATA=o.company_id.vat)+'%7C'+o.fel_numero_autorizacion +'%7CGUESTUSERQR')
+                              % quote_plus('https://report.feel.com.gt/ingfacereport/ingfacereport_documento?uuid='+o.fel_numero_autorizacion)
                               "/></center>
                         </div> -->
+
                         <t t-set="fecha_hora" t-value="fecha_hora_factura(o.invoice_date)"/>
                         <p><strong><center>
                           DATOS DEL GFACE <br/>
-                          CERTIFICADOR NIT 7745482-0 DIGIFACT SERVICIOS,<br/>
+                          CERTIFICADOR NIT 12521337 INFILE,<br/>
                           SOCIEDAD ANONIMA https://felgtaws.digifact.com.gt <br/>
                           Fecha Hora Certificacion <span t-esc="fecha_hora"/>
                         </center></strong></p>

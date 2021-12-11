@@ -23,6 +23,8 @@
                                             <field name="frase"/>
                                         </tree>
                                     </field>
+                                    <field name="fel_logo"/>
+                                    <field name="fel_texto_logo"/>
                                 </group>
                             </group>
 

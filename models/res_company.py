@@ -21,5 +21,7 @@ class ResCompany(models.Model):
     fel_frase_ids = fields.One2many('infilefel.frase','company_id','Frases')
     feel_codigo_exportador = fields.Char('Codigo exportador')
     certificador = fields.Char('Certificador', default="INFILE")
+    fel_logo = fields.Binary('Logo fel')
+    fel_texto_logo = fields.Char('Texto logo fel')
 
     # feel_codigo_establecimiento = fields.Char('Codigo de establecimiento')
