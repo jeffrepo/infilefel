@@ -433,7 +433,7 @@ class AccountMove(models.Model):
                         else:
                             raise UserError(str(retorno_certificacion_json))
                 else:
-                    raise UserError(str(retorno_certificacion_json))
+                    raise UserError(str(respone_json))
 
         return super(AccountMove, self)._post()
 
