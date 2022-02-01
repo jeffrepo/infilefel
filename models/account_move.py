@@ -290,7 +290,7 @@ class AccountMove(models.Model):
                     TagTotalImpuestos.append(TagTotalImpuesto)
 
                 TagGranTotal = etree.SubElement(TagTotales,DTE_NS+"GranTotal",{})
-                TagGranTotal.text = str(factura.amount_total)
+                TagGranTotal.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))
 
                 if tipo == 'FACT' and factura.currency_id !=  factura.company_id.currency_id and factura.tipo_factura == "exportacion":
                     dato_impuesto = {'NombreCorto': "IVA",'TotalMontoImpuesto': str(0.00)}
