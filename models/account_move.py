@@ -286,12 +286,12 @@ class AccountMove(models.Model):
                     for i in lista_impuestos:
                         logging.warn(i)
                         total_impuesto += float(i['monto'])
-                    dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.2f}'.format(total_impuesto))}
+                    dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.6f}'.format(total_impuesto))}
                     TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
                     TagTotalImpuestos.append(TagTotalImpuesto)
 
                 TagGranTotal = etree.SubElement(TagTotales,DTE_NS+"GranTotal",{})
-                TagGranTotal.text = '{:.3f}'.format(factura.currency_id.round(factura.amount_total))
+                TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
 
                 if tipo == 'FACT' and factura.currency_id !=  factura.company_id.currency_id and factura.tipo_factura == "exportacion":
                     dato_impuesto = {'NombreCorto': "IVA",'TotalMontoImpuesto': str(0.00)}
