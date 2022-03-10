@@ -21,6 +21,7 @@
         'views/reporte_ticket.xml',
         'data/paperformat_ticket.xml',
         'views/report.xml',
+        'security/ir.model.access.csv',
     ],
     'installable': True,
     'auto_install': False,

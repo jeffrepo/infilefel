@@ -7,7 +7,7 @@
             <field name="model">account.journal</field>
             <field name="inherit_id" ref="account.view_account_journal_form"/>
             <field name="arch" type="xml">
-                <page name="journal_entries" position="after">
+                <page name="bank_account" position="after">
                     <page name="infile_config" string="Facturación Electrónica">
                         <group>
                             <group>
@@ -17,6 +17,7 @@
                             <group>
                                 <field name="fel_nombre_comercial"/>
                                 <field name="direccion_id"/>
+                                <!-- <field name="telefono"/> -->
                             </group>
                         </group>
                     </page>
