@@ -14,9 +14,9 @@ import datetime
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    fel_numero_autorizacion = fields.Char('Feel Numero de autorizacion')
-    fel_serie = fields.Char('Feel serie')
-    fel_numero = fields.Char('Feel numero')
+    fel_numero_autorizacion = fields.Char('Número de autorización')
+    fel_serie = fields.Char('Serie')
+    fel_numero = fields.Char('Número')
     # fel_uuid = fields.Char('UUID')
     fel_documento_certificado = fields.Char('Documento Feel')
     fel_incoterm = fields.Selection([
@@ -59,6 +59,10 @@ class AccountMove(models.Model):
                     "dte": "http://www.sat.gob.gt/dte/fel/0.2.0",
                     "xsi": "http://www.w3.org/2001/XMLSchema-instance"
                 }
+
+                if factura.invoice_date != True:
+                    factura.invoice_date = fields.Date.context_today(self)
+
                 moneda = str(factura.currency_id.name)
                 logging.warn(moneda)
                 fecha = datetime.datetime.strptime(str(factura.invoice_date), '%Y-%m-%d').date().strftime('%Y-%m-%d')
