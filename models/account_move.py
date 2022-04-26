@@ -209,7 +209,6 @@ class AccountMove(models.Model):
                         }
                         numero_linea += 1
                         TagItem =  etree.SubElement(TagItems,DTE_NS+"Item",linea_datos)
-
                         cantidad = linea.quantity
                         unidad_medida = "UNI"
                         descripcion = linea.product_id.name
