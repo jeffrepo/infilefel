@@ -213,6 +213,11 @@ class AccountMove(models.Model):
                         cantidad = linea.quantity
                         unidad_medida = "UNI"
                         descripcion = linea.product_id.name
+                        if factura.journal_id.descripcion_factura:
+                            descripcion = linea.name
+                        if factura.journal_id.producto_descripcion:
+                            descripcion = str(linea.product_id.name) + ' ' +str(linea.name)
+
                         # precio_unitario = (linea.price_unit * (1 - (linea.discount) / 100.0)) if linea.discount > 0 else linea.price_unit
                         precio_unitario = linea.price_unit
                         precio = linea.price_unit * linea.quantity

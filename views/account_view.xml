@@ -17,6 +17,8 @@
                             <group>
                                 <field name="fel_nombre_comercial"/>
                                 <field name="direccion_id"/>
+                                <field name="producto_descripcion"/>
+                                <field name="descripcion_factura"/>
                                 <!-- <field name="telefono"/> -->
                             </group>
                         </group>
