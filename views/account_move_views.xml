@@ -11,7 +11,6 @@
                   <field name="fel_serie" readonly="1"/>
                   <field name="fel_numero" readonly="1"/>
                   <field name="fel_numero_autorizacion" readonly="1"/>
-                  <!-- <field name="fel_uuid"/> -->
                   <field name="fel_documento_certificado" widget ="url" readonly="1"/>
               </group>
               <field name="invoice_user_id" position="after">
