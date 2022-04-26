@@ -14,11 +14,11 @@ import datetime
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    fel_numero_autorizacion = fields.Char('Número de autorización')
-    fel_serie = fields.Char('Serie')
-    fel_numero = fields.Char('Número')
+    fel_numero_autorizacion = fields.Char('Número de autorización', copy=False, tracking=True, states={'draft': [('readonly', False)]})
+    fel_serie = fields.Char('Serie', copy=False, tracking=True, states={'draft': [('readonly', False)]})
+    fel_numero = fields.Char('Número', copy=False, tracking=True, states={'draft': [('readonly', False)]})
     # fel_uuid = fields.Char('UUID')
-    fel_documento_certificado = fields.Char('Documento Feel')
+    fel_documento_certificado = fields.Char('Documento Feel', copy=False, tracking=True, states={'draft': [('readonly', False)]})
     fel_incoterm = fields.Selection([
             ('EXW', 'En fábrica'),
             ('FCA', 'Libre transportista'),
