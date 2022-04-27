@@ -46,7 +46,7 @@ class AccountMove(models.Model):
 
     def _post(self,soft=True):
         for factura in self:
-            if factura.journal_id and factura.move_type == 'out_invoice' and factura.journal_id.fel_tipo_dte and factura.journal_id.fel_codigo_establecimiento and factura.company_id.fel_usuario and factura.company_id.fel_llave_firma:
+            if factura.fel_serie == False and factura.fel_numero_autorizacion == False and factura.journal_id and factura.move_type == 'out_invoice' and factura.journal_id.fel_tipo_dte and factura.journal_id.fel_codigo_establecimiento and factura.company_id.fel_usuario and factura.company_id.fel_llave_firma:
                 logging.warn(factura)
                 # Definimos SHEMALOCATION
                 lista_impuestos = []
