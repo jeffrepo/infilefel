@@ -228,7 +228,7 @@ class AccountMove(models.Model):
                         TagUnidadMedida = etree.SubElement(TagItem,DTE_NS+"UnidadMedida",{})
                         TagUnidadMedida.text = str(unidad_medida)
                         TagDescripcion = etree.SubElement(TagItem,DTE_NS+"Descripcion",{})
-                        TagDescripcion.text = (str(linea.product_id.default_code) +'|'+ str(descripcion)) if linea.product_id.default_code else descripcion
+                        TagDescripcion.text = (str(linea.product_id.default_code) +'|'+ str(linea.product_id.name)) if linea.product_id.default_code else descripcion
                         TagPrecioUnitario = etree.SubElement(TagItem,DTE_NS+"PrecioUnitario",{})
                         TagPrecioUnitario.text = '{:.6f}'.format(precio_unitario)
                         TagPrecio = etree.SubElement(TagItem,DTE_NS+"Precio",{})
