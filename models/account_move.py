@@ -345,6 +345,28 @@ class AccountMove(models.Model):
                     TagCodigoExportador.text = factura.company_id.fel_codigo_exportador if factura.company_id.fel_codigo_exportador else "N/A"
 
 
+                if tipo == 'NDEB':
+                    factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()  )])
+                    logging.warning('factura_original_id')
+                    logging.warning(factura_original_id)
+                    if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
+                        logging.warn('si')
+                        TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
+                        cno = "{http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0}"
+                        NSMAP_REF = {"cno": "http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0"}
+                        datos_complemento = {'IDComplemento': 'ReferenciasNota', 'NombreComplemento':'Nota de Debito','URIComplemento':'text'}
+                        TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
+                        datos_referencias = {
+                            'FechaEmisionDocumentoOrigen': str(factura_original_id.invoice_date),
+                            'MotivoAjuste': 'Anulación',
+                            'NumeroAutorizacionDocumentoOrigen': str(factura_original_id.fel_numero_autorizacion),
+                            'NumeroDocumentoOrigen': str(factura_original_id.fel_numero),
+                            'SerieDocumentoOrigen': str(factura_original_id.fel_serie),
+                            'Version': '0.0'
+                        }
+                        TagReferenciasNota = etree.SubElement(TagComplemento,cno+"ReferenciasNota",datos_referencias,nsmap=NSMAP_REF)
+                    
+                    
 
                 if tipo == 'NCRE':
                     factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()  )])
@@ -379,6 +401,12 @@ class AccountMove(models.Model):
                                 TagNitCliente.text = factura.partner_id.vat.replace('-','')
                             else:
                                 TagNitCliente.text = factura.partner_id.vat
+                
+                if tipo in ['FACT','NCRE','NDEB','NABN']:
+                    factura._set_next_sequence()
+                    TagAdenda = etree.SubElement(TagSAT,DTE_NS+"Adenda",{})
+                    TagNint = etree.SubElement(TagAdenda,DTE_NS+"NInt",{})
+                    TagNint.text = factura.name
                 # if factura.narration:
                 #     TagAdenda = etree.SubElement(TagDTE, DTE_NS+"Adenda",{})
                 #     TagDECER = etree.SubElement(TagAdenda,"DECertificador",{})
