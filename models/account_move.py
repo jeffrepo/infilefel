@@ -76,9 +76,11 @@ class AccountMove(models.Model):
                 #
                 # if tipo == 'NDEB':
                 #
+                motivo_nc = 'Nota de credito'
                 if tipo == 'NCRE':
-                    factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split())])
+                    factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()[0])])
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
+                        motivo_nc = factura.ref.split(':')[1].split()[1] if len(factura.ref.split(':')[1].split()) > 1 else 'Nota de credito'
                         tipo == 'NCRE'
                         logging.warn('si es nota credito')
                     else:
@@ -381,7 +383,7 @@ class AccountMove(models.Model):
                         TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
                         datos_referencias = {
                             'FechaEmisionDocumentoOrigen': str(factura_original_id.invoice_date),
-                            'MotivoAjuste': 'Nota de credito factura',
+                            'MotivoAjuste': motivo_nc,
                             'NumeroAutorizacionDocumentoOrigen': str(factura_original_id.fel_numero_autorizacion),
                             'NumeroDocumentoOrigen': str(factura_original_id.fel_numero),
                             'SerieDocumentoOrigen': str(factura_original_id.fel_serie),
