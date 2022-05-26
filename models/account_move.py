@@ -46,10 +46,6 @@ class AccountMove(models.Model):
 
     def _post(self,soft=True):
         for factura in self:
-            logging.warning('SPLITS')
-            logging.warning(factura.ref.split(':')[1].split())
-            motivo_nc = factura.ref.split(':')[1].split()[1] if len(factura.ref.split(':')[1].split()) > 1 else 'Nota de credito'
-            logging.warning(motivo_nc)
             if factura.fel_serie and factura.fel_numero_autorizacion:
                 raise UserError(str('NO PUEDE VALIDAR FACTURA DE NUEVO POR QUE YA FUE CERTIFICADA UNA VEZ'))
 
@@ -81,14 +77,9 @@ class AccountMove(models.Model):
                 # if tipo == 'NDEB':
                 #
                 motivo_nc = ''
-                logging.warning('TIPO')
-                logging.warning(tipo)
                 factura_original_id = False
                 if tipo == 'NCRE':
-                    logging.warning(factura.ref.split(':')[1].split()[0])
                     factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()[0].replace(",", "")  )])
-                    logging.warning('NOTA DE CREDITO')
-                    logging.warning(factura_original_id)
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                         tipo == 'NCRE'
                         factura.ref.split(':')[1].split().pop(0)
