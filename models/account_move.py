@@ -46,10 +46,14 @@ class AccountMove(models.Model):
 
     def _post(self,soft=True):
         for factura in self:
+            logging.warning('SPLITS')
+            logging.warning(factura.ref.split(':')[1].split())
+            motivo_nc = factura.ref.split(':')[1].split()[1] if len(factura.ref.split(':')[1].split()) > 1 else 'Nota de credito'
+            logging.warning(motivo_nc)
             if factura.fel_serie and factura.fel_numero_autorizacion:
                 raise UserError(str('NO PUEDE VALIDAR FACTURA DE NUEVO POR QUE YA FUE CERTIFICADA UNA VEZ'))
 
-            if factura.journal_id and factura.move_type in ['out_invoice','out_refund'] and factura.journal_id.fel_tipo_dte and factura.journal_id.fel_codigo_establecimiento and factura.company_id.fel_usuario and factura.company_id.fel_llave_firma:
+            if factura.journal_id:
                 logging.warn(factura)
                 # Definimos SHEMALOCATION
                 lista_impuestos = []
@@ -76,12 +80,19 @@ class AccountMove(models.Model):
                 #
                 # if tipo == 'NDEB':
                 #
-                motivo_nc = 'Nota de credito'
+                motivo_nc = ''
+                logging.warning('TIPO')
+                logging.warning(tipo)
+                factura_original_id = False
                 if tipo == 'NCRE':
-                    factura_original_id = self.env['account.move'].search([('name','=', factura.ref.split(':')[1].split()[0].replace(",", "") )])
+                    logging.warning(factura.ref.split(':')[1].split()[0])
+                    factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()[0].replace(",", "")  )])
+                    logging.warning('NOTA DE CREDITO')
+                    logging.warning(factura_original_id)
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
-                        motivo_nc = factura.ref.split(':')[1].split()[1] if len(factura.ref.split(':')[1].split()) > 1 else 'Nota de credito'
                         tipo == 'NCRE'
+                        factura.ref.split(':')[1].split().pop(0)
+                        motivo_nc =  " ".join(factura.ref.split(':')[1].split()) if len(factura.ref.split(':')[1].split()) >= 1 else 'Nota de credito'
                         logging.warn('si es nota credito')
                     else:
                         raise UserError(str('NOTA DE CREDITO DEBE DE SER CON LA MISMA MONEDA QUE LA FACTURA ORIGINAL'))
@@ -371,9 +382,6 @@ class AccountMove(models.Model):
                     
 
                 if tipo == 'NCRE':
-                    factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()[0].replace(",", "")  )])
-                    logging.warning('factura_original_id')
-                    logging.warning(factura_original_id)
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                         logging.warn('si')
                         TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
@@ -482,6 +490,7 @@ class AccountMove(models.Model):
                     raise UserError(str(respone_json))
 
         return super(AccountMove, self)._post()
+
 
 
     def button_draft(self):
