@@ -49,7 +49,7 @@ class AccountMove(models.Model):
             if factura.fel_serie and factura.fel_numero_autorizacion:
                 raise UserError(str('NO PUEDE VALIDAR FACTURA DE NUEVO POR QUE YA FUE CERTIFICADA UNA VEZ'))
 
-            if factura.journal_id and factura.move_type in ['out_invoice','out_refund'] and factura.journal_id.fel_tipo_dte and factura.journal_id.fel_codigo_establecimiento and factura.company_id.fel_usuario and factura.company_id.fel_llave_firma:
+            if factura.journal_id and factura.journal_id.fel_tipo_dte:
                 logging.warn(factura)
                 # Definimos SHEMALOCATION
                 lista_impuestos = []
@@ -175,7 +175,7 @@ class AccountMove(models.Model):
                     "dte": "http://www.sat.gob.gt/dte/fel/0.2.0"
                 }
 
-                if tipo not in  ['NDEB', 'NCRE','NABN']:
+                if tipo not in  ['NDEB', 'NCRE','NABN','FESP']:
                     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
                     for linea_frase in factura.company_id.fel_frase_ids:
                         frases_datos = {}
@@ -205,7 +205,11 @@ class AccountMove(models.Model):
                 tax_iva = False
                 # monto_gravable_iva = 0
                 # monto_impuesto_iva = 0
+                total_factura_general = 0
+                total_retencion_iva = 0
+                total_retencion_isr = 0
                 for linea in factura.invoice_line_ids:
+                    iva_fespecial = 0
                     if linea.product_id:
                         tax_ids = linea.tax_ids
                         numero_linea = 1
@@ -227,6 +231,7 @@ class AccountMove(models.Model):
                         # precio_unitario = (linea.price_unit * (1 - (linea.discount) / 100.0)) if linea.discount > 0 else linea.price_unit
                         precio_unitario = linea.price_unit
                         precio = linea.price_unit * linea.quantity
+                        total_factura_general += precio
                         descuento = ((linea.quantity * linea.price_unit) - linea.price_total) if linea.discount > 0 else 0
                         precio_subtotal = '{:.6f}'.format(linea.price_subtotal)
                         TagCantidad = etree.SubElement(TagItem,DTE_NS+"Cantidad",{})
@@ -254,26 +259,29 @@ class AccountMove(models.Model):
                             taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.move_id.partner_id)
 
                             for impuesto in taxes['taxes']:
-                                nombre_impuesto = impuesto['name']
-                                valor_impuesto = impuesto['amount']
-                                if impuesto['name'] == 'IVA por Pagar':
+                                #nombre_impuesto = impuesto['name']
+                                #valor_impuesto = impuesto['amount']
+                                if impuesto['name'] == 'IVA por Pagar' or impuesto['name'] == 'IVA por Cobrar':
+                                    nombre_impuesto = impuesto['name']
+                                    valor_impuesto = impuesto['amount']
                                     nombre_impuesto = "IVA"
                                     tax_iva = True
-
-                                TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
-                                TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
-                                TagNombreCorto.text = nombre_impuesto
-                                TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
-                                TagCodigoUnidadGravable.text = "1"
-                                TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
-                                TagMontoGravable.text = str(precio_subtotal)
-                                TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
-                                TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
-                                # monto_gravable_iva += precio_subtotal
-                                # monto_impuesto_iva += valor_impuesto
-
-
-                                lista_impuestos.append({'nombre': nombre_impuesto, 'monto': valor_impuesto})
+                                    lista_impuestos.append({'nombre': nombre_impuesto, 'monto': valor_impuesto})
+   
+                                    
+                                    TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
+                                    TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
+                                    TagNombreCorto.text = nombre_impuesto
+                                    TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
+                                    TagCodigoUnidadGravable.text = "1"
+                                    TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
+                                    TagMontoGravable.text = str(precio_subtotal)
+                                    TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
+                                    TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
+                                    iva_fespecial += valor_impuesto
+                                    total_retencion_iva += valor_impuesto
+                                    # monto_gravable_iva += precio_subtotal
+                                    # monto_impuesto_iva += valor_impuesto
 
                         if (tipo in ['FACT','NCRE']) and factura.currency_id !=  factura.company_id.currency_id:
 
@@ -290,7 +298,10 @@ class AccountMove(models.Model):
 
                         #logging.warn(taxes)
                         TagTotal = etree.SubElement(TagItem,DTE_NS+"Total",{})
-                        TagTotal.text = '{:.6f}'.format(linea.price_total)
+                        if tipo == 'FESP':
+                             TagTotal.text = '{:.6f}'.format(linea.price_subtotal+iva_fespecial)
+                        else:
+                            TagTotal.text = '{:.6f}'.format(linea.price_total)
                         # TagTotal.text =  str(linea.price_total)
 
 
@@ -309,7 +320,10 @@ class AccountMove(models.Model):
                         TagTotalImpuestos.append(TagTotalImpuesto)
 
                 TagGranTotal = etree.SubElement(TagTotales,DTE_NS+"GranTotal",{})
-                TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
+                if tipo == 'FESP':
+                    TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(total_factura_general))
+                else:
+                    TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
 
                 if tipo == 'FACT' and factura.currency_id !=  factura.company_id.currency_id and factura.tipo_factura == "exportacion":
                     dato_impuesto = {'NombreCorto': "IVA",'TotalMontoImpuesto': str(0.00)}
@@ -390,6 +404,26 @@ class AccountMove(models.Model):
                         }
                         TagReferenciasNota = etree.SubElement(TagComplemento,cno+"ReferenciasNota",datos_referencias,nsmap=NSMAP_REF)
 
+                        
+                        
+                if tipo == 'FESP':
+                    logging.warn('si')
+                    TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
+                    cno = "{http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0}"
+                    NSMAP_REF = {"cno": "http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0"}
+                    datos_complemento = {'IDComplemento': '', 'NombreComplemento':'RetencionesFacturaEspecial','URIComplemento':''}
+                    TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
+                    tag_datos_factura_especial = {
+                        'Version': '1.0'
+                    }
+                    TagRetencionFacturaEspecial = etree.SubElement(TagComplemento,cno+"RetencionesFacturaEspecial",tag_datos_factura_especial,nsmap=NSMAP_REF)
+                    TagRetencionISR = etree.SubElement(TagRetencionFacturaEspecial,cno+"RetencionISR",{},nsmap=NSMAP_REF)
+                    TagRetencionISR.text = '{:.6f}'.format(total_factura_general-((factura.amount_total_signed*-1)+total_retencion_iva))
+                    TagRetencionIVA = etree.SubElement(TagRetencionFacturaEspecial,cno+"RetencionIVA",{},nsmap=NSMAP_REF)
+                    TagRetencionIVA.text = '{:.6f}'.format(total_retencion_iva)
+                    TagTotalMenosRetenciones = etree.SubElement(TagRetencionFacturaEspecial,cno+"TotalMenosRetenciones",{},nsmap=NSMAP_REF)
+                    TagTotalMenosRetenciones.text = '{:.6f}'.format(factura.amount_total_signed*-1)
+                    
                 if factura.currency_id.id != factura.company_id.currency_id.id:
                     TagAdenda = etree.SubElement(TagSAT,DTE_NS+"Adenda",{})
                     if factura.comment:
