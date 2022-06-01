@@ -407,21 +407,23 @@ class AccountMove(models.Model):
                         
                         
                 if tipo == 'FESP':
-                    logging.warn('si')
+                    NSMAPFRASECFC = {
+                        "cfc": "http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0"
+                    }
+                    DTE_NS_CFC = "{http://www.sat.gob.gt/face2/ComplementoFacturaEspecial/0.1.0}"
                     TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
-                    cno = "{http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0}"
                     NSMAP_REF = {"cno": "http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0"}
                     datos_complemento = {'IDComplemento': '', 'NombreComplemento':'RetencionesFacturaEspecial','URIComplemento':''}
                     TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
                     tag_datos_factura_especial = {
                         'Version': '1.0'
                     }
-                    TagRetencionFacturaEspecial = etree.SubElement(TagComplemento,cno+"RetencionesFacturaEspecial",tag_datos_factura_especial,nsmap=NSMAP_REF)
-                    TagRetencionISR = etree.SubElement(TagRetencionFacturaEspecial,cno+"RetencionISR",{},nsmap=NSMAP_REF)
+                    TagRetencionFacturaEspecial = etree.SubElement(TagComplemento,DTE_NS_CFC+"RetencionesFacturaEspecial",tag_datos_factura_especial,nsmap=NSMAPFRASECFC)
+                    TagRetencionISR = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"RetencionISR",{},nsmap=NSMAP_REF)
                     TagRetencionISR.text = '{:.6f}'.format(total_factura_general-((factura.amount_total_signed*-1)+total_retencion_iva))
-                    TagRetencionIVA = etree.SubElement(TagRetencionFacturaEspecial,cno+"RetencionIVA",{},nsmap=NSMAP_REF)
+                    TagRetencionIVA = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"RetencionIVA",{},nsmap=NSMAP_REF)
                     TagRetencionIVA.text = '{:.6f}'.format(total_retencion_iva)
-                    TagTotalMenosRetenciones = etree.SubElement(TagRetencionFacturaEspecial,cno+"TotalMenosRetenciones",{},nsmap=NSMAP_REF)
+                    TagTotalMenosRetenciones = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"TotalMenosRetenciones",{},nsmap=NSMAP_REF)
                     TagTotalMenosRetenciones.text = '{:.6f}'.format(factura.amount_total_signed*-1)
                     
                 if factura.currency_id.id != factura.company_id.currency_id.id:
