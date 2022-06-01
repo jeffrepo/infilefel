@@ -416,7 +416,7 @@ class AccountMove(models.Model):
                     datos_complemento = {'IDComplemento': '', 'NombreComplemento':'RetencionesFacturaEspecial','URIComplemento':''}
                     TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
                     tag_datos_factura_especial = {
-                        'Version': '1.0'
+                        'Version': '1'
                     }
                     TagRetencionFacturaEspecial = etree.SubElement(TagComplemento,DTE_NS_CFC+"RetencionesFacturaEspecial",tag_datos_factura_especial,nsmap=NSMAPFRASECFC)
                     TagRetencionISR = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"RetencionISR",{},nsmap=NSMAP_REF)
