@@ -440,7 +440,7 @@ class AccountMove(models.Model):
                             else:
                                 TagNitCliente.text = factura.partner_id.vat
                 
-                if tipo in ['FACT','NCRE','NDEB','NABN']:
+                if tipo in ['FACT','NCRE','NDEB','NABN','FESP']:
                     factura._set_next_sequence()
                     TagAdenda = etree.SubElement(TagSAT,DTE_NS+"Adenda",{})
                     TagNint = etree.SubElement(TagAdenda,DTE_NS+"NInt",{})
