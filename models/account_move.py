@@ -178,11 +178,12 @@ class AccountMove(models.Model):
                 if tipo == 'FESP' and len(factura.company_id.fel_frase_ids) > 1:
                     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
                     frases_datos = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
+                    TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
 
                 if tipo == 'FACT' and len(factura.company_id.fel_frase_ids) > 0:
                     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
                     frases_datos = {"CodigoEscenario": factura.company_id.fel_frase_ids[0].codigo,"TipoFrase":factura.company_id.fel_frase_ids[0].frase}
-
+                    TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
 
 
                 # LO CAMBIAMOS POR LO DE ARRIBA EL 27 DE JUNIO DEL 2022  linea 178
