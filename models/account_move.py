@@ -175,27 +175,34 @@ class AccountMove(models.Model):
                     "dte": "http://www.sat.gob.gt/dte/fel/0.2.0"
                 }
 
-                if tipo not in  ['NDEB', 'NCRE','NABN','FESP']:
+                if tipo == 'FESP' and len(factura.company_id.fel_frase_ids) > 1:
                     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
-                    for linea_frase in factura.company_id.fel_frase_ids:
-                        frases_datos = {}
-                        if tipo == 'FACT' and factura.currency_id !=  factura.company_id.currency_id:
-                            if linea_frase.frase:
-                                frases_datos = {"CodigoEscenario": linea_frase.codigo,"TipoFrase":linea_frase.frase}
-                            else:
-                                frases_datos = {"CodigoEscenario": linea_frase.codigo}
-                        if tipo == 'FACT' and factura.currency_id ==  factura.company_id.currency_id:
-                            if int(linea_frase.frase) == 4:
-                                continue
-                            else:
-                                frases_datos = {"CodigoEscenario": linea_frase.codigo,"TipoFrase":linea_frase.frase}
-                        # if tipo == 'NCRE':
-                        #     if linea_frase.frase:
-                        #         frases_datos = {"CodigoEscenario": linea_frase.codigo,"TipoFrase":linea_frase.frase}
-                        #     else:
-                        #         frases_datos = {"CodigoEscenario": linea_frase.codigo}
-                        TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
-                        # TagFrases.append(TagFrase)
+                    frases_datos = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
+
+                if tipo == 'FACT' and len(factura.company_id.fel_frase_ids) > 0:
+                    TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
+                    frases_datos = {"CodigoEscenario": factura.company_id.fel_frase_ids[0].codigo,"TipoFrase":factura.company_id.fel_frase_ids[0].frase}
+
+
+
+                # LO CAMBIAMOS POR LO DE ARRIBA EL 27 DE JUNIO DEL 2022  linea 178
+                # if tipo not in  ['NDEB', 'NCRE','NABN','FESP']:
+                #     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
+                #     for linea_frase in factura.company_id.fel_frase_ids:
+                #         frases_datos = {}
+                #         if tipo == 'FACT' and factura.currency_id !=  factura.company_id.currency_id:
+                #             if linea_frase.frase:
+                #                 frases_datos = {"CodigoEscenario": linea_frase.codigo,"TipoFrase":linea_frase.frase}
+                #             else:
+                #                 frases_datos = {"CodigoEscenario": linea_frase.codigo}
+                #         if tipo == 'FACT' and factura.currency_id ==  factura.company_id.currency_id:
+                #             if int(linea_frase.frase) == 4:
+                #                 continue
+                #             else:
+                #                 frases_datos = {"CodigoEscenario": linea_frase.codigo,"TipoFrase":linea_frase.frase}
+                #
+                #         TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
+                #
 
 
                 # Items
@@ -267,8 +274,8 @@ class AccountMove(models.Model):
                                     nombre_impuesto = "IVA"
                                     tax_iva = True
                                     lista_impuestos.append({'nombre': nombre_impuesto, 'monto': valor_impuesto})
-   
-                                    
+
+
                                     TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
                                     TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
                                     TagNombreCorto.text = nombre_impuesto
@@ -383,8 +390,8 @@ class AccountMove(models.Model):
                             'Version': '0.0'
                         }
                         TagReferenciasNota = etree.SubElement(TagComplemento,cno+"ReferenciasNota",datos_referencias,nsmap=NSMAP_REF)
-                    
-                    
+
+
 
                 if tipo == 'NCRE':
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
@@ -404,8 +411,8 @@ class AccountMove(models.Model):
                         }
                         TagReferenciasNota = etree.SubElement(TagComplemento,cno+"ReferenciasNota",datos_referencias,nsmap=NSMAP_REF)
 
-                        
-                        
+
+
                 if tipo == 'FESP':
                     NSMAPFRASECFC = {
                         "cfe": "http://www.sat.gob.gt/face2/ComplementoFacturaEspecial/0.1.0"
@@ -418,7 +425,7 @@ class AccountMove(models.Model):
                     tag_datos_factura_especial = {
                         'Version': '1'
                     }
-                    
+
                     TagRetencionFacturaEspecial = etree.SubElement(TagComplemento,DTE_NS_CFC+"RetencionesFacturaEspecial",tag_datos_factura_especial,nsmap=NSMAPFRASECFC)
                     TagRetencionISR = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"RetencionISR")
                     TagRetencionISR.text = '{:.6f}'.format(total_factura_general-((factura.amount_total_signed*-1)+total_retencion_iva))
@@ -426,7 +433,7 @@ class AccountMove(models.Model):
                     TagRetencionIVA.text = '{:.6f}'.format(total_retencion_iva)
                     TagTotalMenosRetenciones = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"TotalMenosRetenciones")
                     TagTotalMenosRetenciones.text = '{:.6f}'.format(factura.amount_total_signed*-1)
-                    
+
                 if factura.currency_id.id != factura.company_id.currency_id.id:
                     TagAdenda = etree.SubElement(TagSAT,DTE_NS+"Adenda",{})
                     if factura.comment:
@@ -439,7 +446,7 @@ class AccountMove(models.Model):
                                 TagNitCliente.text = factura.partner_id.vat.replace('-','')
                             else:
                                 TagNitCliente.text = factura.partner_id.vat
-                
+
                 if tipo in ['FACT','NCRE','NDEB','NABN','FESP']:
                     factura._set_next_sequence()
                     TagAdenda = etree.SubElement(TagSAT,DTE_NS+"Adenda",{})
