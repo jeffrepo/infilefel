@@ -146,9 +146,9 @@ class AccountMove(models.Model):
                 TagCodigoPostal = etree.SubElement(TagDireccionEmisor,DTE_NS+"CodigoPostal",{})
                 TagCodigoPostal.text = str(factura.journal_id.direccion_id.zip)
                 TagMunicipio = etree.SubElement(TagDireccionEmisor,DTE_NS+"Municipio",{})
-                TagMunicipio.text = str(factura.journal_id.direccion_id.city)
+                TagMunicipio.text = str(factura.journal_id.direccion_id.city) if factura.journal_id.direccion_id.city else ""
                 TagDepartamento = etree.SubElement(TagDireccionEmisor,DTE_NS+"Departamento",{})
-                TagDepartamento.text = str(factura.journal_id.direccion_id.state_id.name)
+                TagDepartamento.text = str(factura.journal_id.direccion_id.state_id.name) if factura.journal_id.direccion_id.state_id else ""
                 TagPais = etree.SubElement(TagDireccionEmisor,DTE_NS+"Pais",{})
                 TagPais.text = "GT"
                 # Datos de receptor
