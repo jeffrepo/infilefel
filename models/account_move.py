@@ -215,6 +215,7 @@ class AccountMove(models.Model):
                 # monto_impuesto_iva = 0
                 total_factura_general = 0
                 total_retencion_iva = 0
+                total_retencion_iva_fesp = 0
                 total_retencion_isr = 0
                 for linea in factura.invoice_line_ids:
                     iva_fespecial = 0
@@ -269,6 +270,9 @@ class AccountMove(models.Model):
                             for impuesto in taxes['taxes']:
                                 #nombre_impuesto = impuesto['name']
                                 #valor_impuesto = impuesto['amount']
+                                if impuesto ['name'] == 'IVA Factura Especial':
+                                    total_retencion_iva_fesp += impuesto['name']
+
                                 if impuesto['name'] == 'IVA por Pagar' or impuesto['name'] == 'IVA por Cobrar':
                                     nombre_impuesto = impuesto['name']
                                     valor_impuesto = impuesto['amount']
@@ -429,7 +433,8 @@ class AccountMove(models.Model):
 
                     TagRetencionFacturaEspecial = etree.SubElement(TagComplemento,DTE_NS_CFC+"RetencionesFacturaEspecial",tag_datos_factura_especial,nsmap=NSMAPFRASECFC)
                     TagRetencionISR = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"RetencionISR")
-                    TagRetencionISR.text = '{:.6f}'.format(total_factura_general-((factura.amount_total_signed*-1)+total_retencion_iva))
+                    # tomamos en cuenta IVA Factura Especial para total_retencion_iva
+                    TagRetencionISR.text = '{:.6f}'.format(total_factura_general-((factura.amount_total_signed*-1)+total_retencion_iva_fesp))
                     TagRetencionIVA = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"RetencionIVA")
                     TagRetencionIVA.text = '{:.6f}'.format(total_retencion_iva)
                     TagTotalMenosRetenciones = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"TotalMenosRetenciones")
