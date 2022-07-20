@@ -267,6 +267,7 @@ class AccountMove(models.Model):
                             logging.warn(precio_unitario)
                             taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.move_id.partner_id)
 
+                            logging.warning(taxes)
                             for impuesto in taxes['taxes']:
                                 #nombre_impuesto = impuesto['name']
                                 #valor_impuesto = impuesto['amount']
