@@ -271,7 +271,7 @@ class AccountMove(models.Model):
                                 #nombre_impuesto = impuesto['name']
                                 #valor_impuesto = impuesto['amount']
                                 if impuesto ['name'] == 'IVA Factura Especial':
-                                    total_retencion_iva_fesp += impuesto['name']
+                                    total_retencion_iva_fesp += impuesto['amount']
 
                                 if impuesto['name'] == 'IVA por Pagar' or impuesto['name'] == 'IVA por Cobrar':
                                     nombre_impuesto = impuesto['name']
