@@ -382,7 +382,7 @@ class AccountMove(models.Model):
                     logging.warning(factura.ref.split(':'))
                     logging.warning(factura.ref.split(':')[1])
                     logging.warning(factura.ref.split(':')[1].split())
-                    factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()  )])
+                    factura_original_id = self.env['account.move'].search([('name','in',factura.ref.split(':')[1].split()  )])
                     logging.warning('factura_original_id')
                     logging.warning(factura_original_id)
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
