@@ -377,6 +377,11 @@ class AccountMove(models.Model):
 
 
                 if tipo == 'NDEB':
+                    logging.warning('NOTA DEBITO')
+                    logging.warning(factura.ref)
+                    logging.warning(factura.ref.split(':'))
+                    logging.warning(factura.ref.split(':')[1])
+                    logging.warning(factura.ref.split(':')[1].split())
                     factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()  )])
                     logging.warning('factura_original_id')
                     logging.warning(factura_original_id)
@@ -397,26 +402,6 @@ class AccountMove(models.Model):
                         }
                         TagReferenciasNota = etree.SubElement(TagComplemento,cno+"ReferenciasNota",datos_referencias,nsmap=NSMAP_REF)
 
-                if tipo == 'NABN':
-                    factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()  )])
-                    logging.warning('factura_original_id')
-                    logging.warning(factura_original_id)
-                    if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
-                        logging.warn('si')
-                        TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
-                        cno = "{http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0}"
-                        NSMAP_REF = {"cno": "http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0"}
-                        datos_complemento = {'IDComplemento': 'ReferenciasNota', 'NombreComplemento':'Nota de Debito','URIComplemento':'text'}
-                        TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
-                        datos_referencias = {
-                            'FechaEmisionDocumentoOrigen': str(factura_original_id.invoice_date),
-                            'MotivoAjuste': 'Anulación',
-                            'NumeroAutorizacionDocumentoOrigen': str(factura_original_id.fel_numero_autorizacion),
-                            'NumeroDocumentoOrigen': str(factura_original_id.fel_numero),
-                            'SerieDocumentoOrigen': str(factura_original_id.fel_serie),
-                            'Version': '0.0'
-                        }
-                        TagReferenciasNota = etree.SubElement(TagComplemento,cno+"ReferenciasNota",datos_referencias,nsmap=NSMAP_REF)
 
 
                 if tipo == 'NCRE':
