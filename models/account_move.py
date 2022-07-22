@@ -386,7 +386,7 @@ class AccountMove(models.Model):
                     if len(referencia_factura_original) > 0:
                         referencia_factura_original = referencia_factura_original[0].replace(",","")
                     logging.warning(referencia_factura_original)
-                    factura_original_id = self.env['account.move'].search([('name','in',referencia_factura_original  )])
+                    factura_original_id = self.env['account.move'].search([('name','=',referencia_factura_original  )])
                     logging.warning('factura_original_id')
                     logging.warning(factura_original_id)
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
