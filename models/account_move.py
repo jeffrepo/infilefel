@@ -67,7 +67,6 @@ class AccountMove(models.Model):
                     factura.invoice_date = fields.Date.context_today(self)
 
                 moneda = str(factura.currency_id.name)
-                logging.warn(moneda)
                 fecha = datetime.datetime.strptime(str(factura.invoice_date), '%Y-%m-%d').date().strftime('%Y-%m-%d')
                 hora = datetime.datetime.strftime(fields.Datetime.context_timestamp(self, datetime.datetime.now()), "%H:%M:%S")
                 fecha_hora_emision = self.fecha_hora_factura(factura.invoice_date)
@@ -175,15 +174,28 @@ class AccountMove(models.Model):
                     "dte": "http://www.sat.gob.gt/dte/fel/0.2.0"
                 }
 
+                #segun fel Versión 1.7.3 no es necesaio frases ni codigos para FESP
                 if tipo == 'FESP' and len(factura.company_id.fel_frase_ids) > 1:
-                    TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
+                    #TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
                     frases_datos = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
-                    TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
+                    #TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
+                    #frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
+                    #logging.warning('FRASES 2')
+                    #logging.warning(frases_datos2)
+                    #TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
 
-                if tipo == 'FACT' and len(factura.company_id.fel_frase_ids) > 0:
+                #validamos tipo de documento para saber que tipo de frases se agregan
+                #segun fel Versión 1.7.3 es necesario frase 2 y frase 1
+                if (tipo in ['FACT','NCRE','NDEB']) and len(factura.company_id.fel_frase_ids) > 0:
                     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
                     frases_datos = {"CodigoEscenario": factura.company_id.fel_frase_ids[0].codigo,"TipoFrase":factura.company_id.fel_frase_ids[0].frase}
+                    logging.warning('FRASES 1')
+                    logging.warning(frases_datos)
                     TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
+                    frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
+                    logging.warning('FRASES 2')
+                    logging.warning(frases_datos2)
+                    TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
 
 
                 # LO CAMBIAMOS POR LO DE ARRIBA EL 27 DE JUNIO DEL 2022  linea 178
@@ -377,16 +389,7 @@ class AccountMove(models.Model):
 
 
                 if tipo == 'NDEB':
-                    logging.warning('NOTA DEBITO')
-                    logging.warning(factura.ref)
-                    logging.warning(factura.ref.split(':'))
-                    logging.warning(factura.ref.split(':')[1])
-                    logging.warning(factura.ref.split(':')[1].split())
-                    referencia_factura_original = factura.ref.split(':')[1].split()
-                    if len(referencia_factura_original) > 0:
-                        referencia_factura_original = referencia_factura_original[0].replace(",","")
-                    logging.warning(referencia_factura_original)
-                    factura_original_id = self.env['account.move'].search([('name','=',referencia_factura_original  )])
+                    factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()  )])
                     logging.warning('factura_original_id')
                     logging.warning(factura_original_id)
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
