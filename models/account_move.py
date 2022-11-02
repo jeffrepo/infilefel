@@ -195,7 +195,7 @@ class AccountMove(models.Model):
                     frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
                     logging.warning('FRASES 2')
                     logging.warning(frases_datos2)
-                    TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
+                    # TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
 
 
                 # LO CAMBIAMOS POR LO DE ARRIBA EL 27 DE JUNIO DEL 2022  linea 178
