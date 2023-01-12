@@ -23,5 +23,9 @@ class ResCompany(models.Model):
     certificador = fields.Char('Certificador', default="INFILE")
     fel_logo = fields.Binary('Logo fel')
     fel_texto_logo = fields.Char('Texto logo fel')
+    fel_numero_abonos_fc = fields.Integer('Numero de abonos FCAM')
+    fel_monto_factura_fc = fields.Boolean('Abono fijo por monto de FCAM')
+    fel_fecha_vencimiento_fc = fields.Boolean('Fecha vencimiento factura para FCAM')
+
 
     # feel_codigo_establecimiento = fields.Char('Codigo de establecimiento')

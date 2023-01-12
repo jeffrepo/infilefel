@@ -14,6 +14,9 @@ import datetime
 class AccountMove(models.Model):
     _inherit = "account.move"
 
+    fel_numero_abonos_fc = fields.Integer('Número de abonos FCAM')
+    fel_fecha_vencimiento_fc = fields.Date('Fecha vencimiento FCAM')
+    fel_monto_abonos_fc = fields.Float('Monto de aboons FCAM')
     fel_numero_autorizacion = fields.Char('Número de autorización', copy=False, tracking=True)
     fel_serie = fields.Char('Serie', copy=False, tracking=True)
     fel_numero = fields.Char('Número', copy=False, tracking=True)
@@ -186,7 +189,7 @@ class AccountMove(models.Model):
 
                 #validamos tipo de documento para saber que tipo de frases se agregan
                 #segun fel Versión 1.7.3 es necesario frase 2 y frase 1
-                if (tipo in ['FACT','NCRE','NDEB']) and len(factura.company_id.fel_frase_ids) > 0:
+                if (tipo in ['FACT','NCRE','NDEB', 'FCAM']) and len(factura.company_id.fel_frase_ids) > 0:
                     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
                     frases_datos = {"CodigoEscenario": factura.company_id.fel_frase_ids[0].codigo,"TipoFrase":factura.company_id.fel_frase_ids[0].frase}
                     logging.warning('FRASES 1')
@@ -429,6 +432,34 @@ class AccountMove(models.Model):
                         }
                         TagReferenciasNota = etree.SubElement(TagComplemento,cno+"ReferenciasNota",datos_referencias,nsmap=NSMAP_REF)
 
+
+                if tipo == 'FCAM':
+                    NSMAPFCAM = {
+                        "cfc": "http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0"
+                    }
+                    DTE_NS_CFCAM = "{http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0}"
+                    TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
+                    datos_complemento = {'IDComplemento': 'Cambiaria', 'NombreComplemento':'Cambiaria','URIComplemento':'http://www.sat.gob.gt/fel/cambiaria.xsd'}
+                    TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
+                    tag_datos_factura_cambiaria = {
+                        'Version': '1'
+                    }
+                    TagAbonosFacturaCambiaria = etree.SubElement(TagComplemento,DTE_NS_CFCAM+"AbonosFacturaCambiaria",tag_datos_factura_cambiaria,nsmap=NSMAPFCAM)
+                    TagAbono = etree.SubElement(TagAbonosFacturaCambiaria,DTE_NS_CFCAM+"Abono")
+                    TagNumeroAbono = etree.SubElement(TagAbono,DTE_NS_CFCAM+"NumeroAbono")
+                    logging.warning('numero abonos')
+                    logging.warning(factura.fel_numero_abonos_fc)
+                    TagNumeroAbono.text = str(factura.fel_numero_abonos_fc) if factura.fel_numero_abonos_fc > 0 else str(factura.company_id.fel_numero_abonos_fc)
+                    TagFechaVencimiento = etree.SubElement(TagAbono,DTE_NS_CFCAM+"FechaVencimiento")
+                    fecha_fcam = False
+                    if factura.fel_fecha_vencimiento_fc:
+                        fecha_fcam = datetime.datetime.strftime(factura.fel_fecha_vencimiento_fc, "%Y-%m-%d")
+                    else:
+                        fecha_fcam = datetime.datetime.strftime(factura.invoice_date_due, "%Y-%m-%d")
+
+                    TagFechaVencimiento.text = fecha_fcam
+                    TagMontoAbono = etree.SubElement(TagAbono,DTE_NS_CFCAM+"MontoAbono")
+                    TagMontoAbono.text = str(factura.fel_monto_abonos_fc) if factura.fel_monto_abonos_fc > 0 else str(factura.amount_total)
 
 
                 if tipo == 'FESP':
