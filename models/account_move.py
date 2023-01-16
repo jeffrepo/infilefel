@@ -123,13 +123,25 @@ class AccountMove(models.Model):
                         nit_partner = factura.partner_id.vat.replace('-','')
                     else:
                         nit_partner = factura.partner_id.vat
+                        
+                if factura.amount_total > 2500:
+                    if (nit_partner == "CF" or nit_partner == "C/F") and factura.partner_id.documento_personal_identificacion == False:
+                        raise UserError('EL cliente debe de tener NIT O DPI para poder emitir la factura')
 
+                        
                 datos_receptor = {
                     "CorreoReceptor": factura.partner_id.email or "",
-                    "IDReceptor": str(nit_partner),
                     "NombreReceptor": factura.partner_id.name
                 }
-
+                
+                #VERIFICAMOS SI SE FACTURA CON NIT O DPI
+                if factura.partner_id.documento_personal_identificacion == False:
+                    datos_receptor['IDReceptor'] = str(nit_partner)
+                if (nit_partner == "CF" or nit_partner == "C/F") and factura.partner_id.documento_personal_identificacion:
+                    datos_receptor['TipoEspecial'] = "CUI"
+                    datos_receptor['IDReceptor'] = str(factura.partner_id.documento_personal_identificacion)
+                  
+                
 
                 if tipo == 'FACT' and factura.currency_id !=  factura.company_id.currency_id:
                     datos_receptor['IDReceptor'] = "CF"
