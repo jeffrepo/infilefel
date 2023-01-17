@@ -207,9 +207,12 @@ class AccountMove(models.Model):
                     logging.warning('FRASES 1')
                     logging.warning(frases_datos)
                     TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
-                    frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
-                    logging.warning('FRASES 2')
-                    logging.warning(frases_datos2)
+                    if len(factura.company_id.fel_frase_ids) > 1:
+                        frases_datos2 = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
+                        TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
+                    #frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
+                    #logging.warning('FRASES 2')
+                    #logging.warning(frases_datos2)
                     # TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
 
 
