@@ -403,7 +403,7 @@ class AccountMove(models.Model):
                     TagNombreConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"NombreConsignatarioODestinatario",{})
                     TagNombreConsignatarioODestinatario.text = str(factura.partner_id.name)
                     TagDireccionConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"DireccionConsignatarioODestinatario",{})
-                    TagDireccionConsignatarioODestinatario.text = str(factura.company_id.street or "")+" "+str(factura.company_id.street2 or "")
+                    TagDireccionConsignatarioODestinatario.text = str(factura.company_id.street or "")+str(" " + str(factura.company_id.street2) if factura.company_id.street2 else '' )
                     TagCodigoConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"CodigoConsignatarioODestinatario",{})
                     TagCodigoConsignatarioODestinatario.text = str(factura.company_id.zip or "")
                     TagNombreComprador = etree.SubElement(TagExportacion,cex+"NombreComprador",{})
