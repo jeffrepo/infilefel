@@ -209,7 +209,7 @@ class AccountMove(models.Model):
                     logging.warning(frases_datos)
                     TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
                     if len(factura.company_id.fel_frase_ids) > 1:
-                        if factura.company_id.fel_frase_ids[1].frase != 5:
+                        if int(factura.company_id.fel_frase_ids[1].frase) != 5:
                             frases_datos2 = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
                             TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
                     #frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
