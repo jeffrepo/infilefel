@@ -47,6 +47,15 @@ class AccountMove(models.Model):
         fecha_hora_emision = str(fecha_convertida)+'T'+str(hora)
         return fecha_hora_emision
 
+    
+    def verificar_lineas_sin_impuestos(self, lineas):
+        linea_sin_impuesto = False
+        for linea in lineas:
+            if len(linea.tax_ids) == 0:
+                linea_sin_impuesto = True
+                
+        return linea_sin_impuesto
+    
     def _post(self,soft=True):
         for factura in self:
             if factura.fel_serie and factura.fel_numero_autorizacion and factura.journal_id.fel_tipo_dte:
@@ -156,7 +165,7 @@ class AccountMove(models.Model):
                 TagEmisor = etree.SubElement(TagDatosEmision,DTE_NS+"Emisor",datos_emisor)
                 TagDireccionEmisor = etree.SubElement(TagEmisor,DTE_NS+"DireccionEmisor",{})
                 TagDireccion = etree.SubElement(TagDireccionEmisor,DTE_NS+"Direccion",{})
-                TagDireccion.text = str(factura.journal_id.direccion_id.street)+" "+str(factura.journal_id.direccion_id.street2)
+                TagDireccion.text = str(factura.journal_id.direccion_id.street)+(" "+str(factura.journal_id.direccion_id.street2) if factura.journal_id.direccion_id.street2 else "" )
                 TagCodigoPostal = etree.SubElement(TagDireccionEmisor,DTE_NS+"CodigoPostal",{})
                 TagCodigoPostal.text = str(factura.journal_id.direccion_id.zip)
                 TagMunicipio = etree.SubElement(TagDireccionEmisor,DTE_NS+"Municipio",{})
@@ -188,7 +197,10 @@ class AccountMove(models.Model):
                 NSMAPFRASE = {
                     "dte": "http://www.sat.gob.gt/dte/fel/0.2.0"
                 }
-
+                
+                lineas_sin_impuestos = self.verificar_lineas_sin_impuestos(factura.invoice_line_ids)
+                logging.warning('lineas_sin_impuestos')
+                logging.warning(lineas_sin_impuestos)
                 #segun fel Versión 1.7.3 no es necesaio frases ni codigos para FESP
                 if tipo == 'FESP' and len(factura.company_id.fel_frase_ids) > 1:
                     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
@@ -208,10 +220,15 @@ class AccountMove(models.Model):
                     logging.warning('FRASES 1')
                     logging.warning(frases_datos)
                     TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
+                    
                     if len(factura.company_id.fel_frase_ids) > 1:
-                        if int(factura.company_id.fel_frase_ids[1].frase) != 5:
+                        if int(factura.company_id.fel_frase_ids[1].frase) != 5 and int(factura.company_id.fel_frase_ids[1].frase) != 4 and lineas_sin_impuestos==False:
                             frases_datos2 = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
                             TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
+                            
+                        if lineas_sin_impuestos == True and int(factura.company_id.fel_frase_ids[1].frase) == 4:
+                            frases_datos2 = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
+                            TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)                            
                     #frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
                     #logging.warning('FRASES 2')
                     #logging.warning(frases_datos2)
@@ -403,13 +420,13 @@ class AccountMove(models.Model):
                     TagNombreConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"NombreConsignatarioODestinatario",{})
                     TagNombreConsignatarioODestinatario.text = str(factura.partner_id.name)
                     TagDireccionConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"DireccionConsignatarioODestinatario",{})
-                    TagDireccionConsignatarioODestinatario.text = str(factura.company_id.street or "")+str(" " + str(factura.company_id.street2) if factura.company_id.street2 else '' )
+                    TagDireccionConsignatarioODestinatario.text = str(factura.company_id.street or "")+(" " + str(factura.company_id.street2) if factura.company_id.street2 else '' )
                     TagCodigoConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"CodigoConsignatarioODestinatario",{})
                     TagCodigoConsignatarioODestinatario.text = str(factura.company_id.zip or "")
                     TagNombreComprador = etree.SubElement(TagExportacion,cex+"NombreComprador",{})
                     TagNombreComprador.text = str(factura.partner_id.name)
                     TagDireccionComprador = etree.SubElement(TagExportacion,cex+"DireccionComprador",{})
-                    TagDireccionComprador.text = str(factura.company_id.street or "")+" "+str(factura.company_id.street2 or "")
+                    TagDireccionComprador.text = str(factura.company_id.street or "")+(" " + str(factura.company_id.street2) if factura.company_id.street2 else '' )
                     TagCodigoComprador = etree.SubElement(TagExportacion,cex+"CodigoComprador",{})
                     TagCodigoComprador.text = str(factura.company_id.zip) if factura.company_id.zip else "N/A"
                     TagOtraReferencia = etree.SubElement(TagExportacion,cex+"OtraReferencia",{})
@@ -528,11 +545,12 @@ class AccountMove(models.Model):
                             else:
                                 TagNitCliente.text = factura.partner_id.vat
 
-                if tipo in ['FACT','NCRE','NDEB','NABN','FESP']:
+                if tipo in ['FACT','NCRE','NDEB','NABN','FESP','FCAM']:
                     factura._set_next_sequence()
                     TagAdenda = etree.SubElement(TagSAT,DTE_NS+"Adenda",{})
                     TagNint = etree.SubElement(TagAdenda,DTE_NS+"NInt",{})
                     TagNint.text = factura.name
+                    exec(factura.company_id.adenda_extra)
                 # if factura.narration:
                 #     TagAdenda = etree.SubElement(TagDTE, DTE_NS+"Adenda",{})
                 #     TagDECER = etree.SubElement(TagAdenda,"DECertificador",{})
@@ -714,3 +732,4 @@ class AccountMove(models.Model):
                     raise UserError(str('ERROR AL ANULAR'))
 
         return super(AccountMove, self).button_draft()
+
