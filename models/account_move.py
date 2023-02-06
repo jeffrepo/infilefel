@@ -39,6 +39,7 @@ class AccountMove(models.Model):
         help="Termino de entrega")
     tipo_factura = fields.Selection([('venta','Venta'),('compra', 'Compra o Bien'), ('servicio', 'Servicio'),('varios','Varios'), ('combustible', 'Combustible'),('importacion', 'Importación'),('exportacion','Exportación')],
         string="Tipo de factura")
+    fel_no_enviar_tel = fields.Boolean('No enviar telefono fel')
 
 # 4 1 , exportacion
     def fecha_hora_factura(self, fecha):
