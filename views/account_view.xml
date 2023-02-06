@@ -13,6 +13,7 @@
                             <group>
                                 <field name="fel_tipo_dte"/>
                                 <field name="fel_codigo_establecimiento"/>
+                                <field name="columna_extra_fel_py"/>
                             </group>
                             <group>
                                 <field name="fel_nombre_comercial"/>
