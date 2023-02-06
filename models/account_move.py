@@ -205,6 +205,8 @@ class AccountMove(models.Model):
                 #segun fel Versión 1.7.3 no es necesaio frases ni codigos para FESP
                 if tipo == 'FESP' and len(factura.company_id.fel_frase_ids) > 1:
                     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
+                    logging.warning('LA FRASE')
+                    logging.warning(factura.company_id.fel_frase_ids[0].frase)
                     frases_datos = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
                     TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
                     #frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
@@ -299,7 +301,11 @@ class AccountMove(models.Model):
                         TagUnidadMedida = etree.SubElement(TagItem,DTE_NS+"UnidadMedida",{})
                         TagUnidadMedida.text = str(unidad_medida)
                         TagDescripcion = etree.SubElement(TagItem,DTE_NS+"Descripcion",{})
-                        TagDescripcion.text = (str(linea.product_id.name) +'|'+ str(linea.product_id.default_code)) if linea.product_id.default_code else descripcion
+                        if factura.journal_id.columna_extra_fel_py:
+                            logging.warning('si hay py')
+                            exec(factura.journal_id.columna_extra_fel_py)
+                        else:
+                            TagDescripcion.text = (str(linea.product_id.name) +'|'+ str(linea.product_id.default_code)) if linea.product_id.default_code else descripcion
                         TagPrecioUnitario = etree.SubElement(TagItem,DTE_NS+"PrecioUnitario",{})
                         TagPrecioUnitario.text = '{:.6f}'.format(precio_unitario)
                         TagPrecio = etree.SubElement(TagItem,DTE_NS+"Precio",{})
@@ -307,9 +313,9 @@ class AccountMove(models.Model):
                         TagDescuento = etree.SubElement(TagItem,DTE_NS+"Descuento",{})
                         TagDescuento.text =  str('{:.6f}'.format(descuento))
 
-
+                        if tipo != 'NABN':  
                         # impuestos
-                        if tipo != 'NABN':
+                        #f tipo:
                             TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
 
                             logging.warn('IMPUESTOS')
@@ -380,6 +386,7 @@ class AccountMove(models.Model):
 
 
                 TagTotales = etree.SubElement(TagDatosEmision,DTE_NS+"Totales",{})
+                #if tipo != 'NABN': nota de abono sin impuesto
                 if tipo != 'NABN':
                     TagTotalImpuestos = etree.SubElement(TagTotales,DTE_NS+"TotalImpuestos",{})
 
@@ -463,7 +470,7 @@ class AccountMove(models.Model):
 
 
 
-                if tipo == 'NCRE':
+                if tipo == 'NCRE' or tipo == 'NABN':
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                         logging.warn('si')
                         TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
@@ -584,12 +591,14 @@ class AccountMove(models.Model):
                     'es_anulacion': 'N',
                     'archivo': xmls_base64.decode("utf-8")
                 }
-
+                
                 nuevos_headers = {"content-type": "application/json"}
                 response = requests.post(url, json = nuevo_json, headers = nuevos_headers)
 
                 respone_json=response.json()
-                logging.warn(respone_json)
+                logging.warning('respuesta autentic')
+                logging.warning(nuevo_json)
+                logging.warning(respone_json)
 
                 if respone_json['resultado']:
                         headers = {
@@ -598,6 +607,9 @@ class AccountMove(models.Model):
                             "IDENTIFICADOR": str(factura.journal_id.name)+'/'+str(factura.payment_reference) if factura.payment_reference else str(factura.journal_id.name)+'/'+str(factura.id),
                             "Content-Type": "application/json",
                         }
+                        
+                        logging.warning('VALIDADO')
+                        logging.warning(headers)
 
                         nit_company = "CF"
                         if '-' in factura.company_id.vat:
@@ -609,7 +621,7 @@ class AccountMove(models.Model):
                             "correo_copia": str(factura.company_id.email),
                             "xml_dte": respone_json["archivo"]
                         }
-
+                        
                         r = requests.post("https://certificador.feel.com.gt/fel/certificacion/v2/dte/", json=data, headers=headers)
                         retorno_certificacion_json = r.json()
                         logging.warn(retorno_certificacion_json)
@@ -733,4 +745,3 @@ class AccountMove(models.Model):
                     raise UserError(str('ERROR AL ANULAR'))
 
         return super(AccountMove, self).button_draft()
-
