@@ -30,5 +30,6 @@ class AccountJournal(models.Model):
     direccion_id = fields.Many2one('res.partner','Dirección')
     producto_descripcion = fields.Boolean('Producto + descripcion')
     descripcion_factura = fields.Boolean('Descripcion factura')
+    columna_extra_fel_py = fields.Text('Columna extra py linea')
     # direccion_sucursal = fields.Char('Dirección sucursal')
     # telefono = fields.Char('Teléfono')
