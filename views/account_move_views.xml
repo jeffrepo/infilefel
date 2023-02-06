@@ -18,6 +18,7 @@
                   <field name="fel_numero_abonos_fc"/>
                   <field name="fel_fecha_vencimiento_fc"/>
                   <field name="fel_monto_abonos_fc"/>
+                  <field name="fel_no_enviar_tel"/>
               </field>
           </field>
       </record>
