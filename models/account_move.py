@@ -48,15 +48,15 @@ class AccountMove(models.Model):
         fecha_hora_emision = str(fecha_convertida)+'T'+str(hora)
         return fecha_hora_emision
 
-    
+
     def verificar_lineas_sin_impuestos(self, lineas):
         linea_sin_impuesto = False
         for linea in lineas:
             if len(linea.tax_ids) == 0:
                 linea_sin_impuesto = True
-                
+
         return linea_sin_impuesto
-    
+
     def _post(self,soft=True):
         for factura in self:
             if factura.fel_serie and factura.fel_numero_autorizacion and factura.journal_id.fel_tipo_dte:
@@ -133,25 +133,25 @@ class AccountMove(models.Model):
                         nit_partner = factura.partner_id.vat.replace('-','')
                     else:
                         nit_partner = factura.partner_id.vat
-                        
+
                 if factura.amount_total > 2500:
                     if (nit_partner == "CF" or nit_partner == "C/F") and factura.partner_id.documento_personal_identificacion == False:
                         raise UserError('EL cliente debe de tener NIT O DPI para poder emitir la factura')
 
-                        
+
                 datos_receptor = {
                     "CorreoReceptor": factura.partner_id.email or "",
                     "NombreReceptor": factura.partner_id.name
                 }
-                
+
                 #VERIFICAMOS SI SE FACTURA CON NIT O DPI
                 if factura.partner_id.documento_personal_identificacion == False:
                     datos_receptor['IDReceptor'] = str(nit_partner)
                 if (nit_partner == "CF" or nit_partner == "C/F") and factura.partner_id.documento_personal_identificacion:
                     datos_receptor['TipoEspecial'] = "CUI"
                     datos_receptor['IDReceptor'] = str(factura.partner_id.documento_personal_identificacion)
-                  
-                
+
+
 
                 if tipo == 'FACT' and factura.currency_id !=  factura.company_id.currency_id:
                     datos_receptor['IDReceptor'] = "CF"
@@ -198,7 +198,7 @@ class AccountMove(models.Model):
                 NSMAPFRASE = {
                     "dte": "http://www.sat.gob.gt/dte/fel/0.2.0"
                 }
-                
+
                 lineas_sin_impuestos = self.verificar_lineas_sin_impuestos(factura.invoice_line_ids)
                 logging.warning('lineas_sin_impuestos')
                 logging.warning(lineas_sin_impuestos)
@@ -223,15 +223,15 @@ class AccountMove(models.Model):
                     logging.warning('FRASES 1')
                     logging.warning(frases_datos)
                     TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
-                    
+
                     if len(factura.company_id.fel_frase_ids) > 1:
                         if int(factura.company_id.fel_frase_ids[1].frase) != 5 and int(factura.company_id.fel_frase_ids[1].frase) != 4 and lineas_sin_impuestos==False:
                             frases_datos2 = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
                             TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
-                            
-                        if lineas_sin_impuestos == True and int(factura.company_id.fel_frase_ids[1].frase) == 4:
+
+                        if lineas_sin_impuestos == True and int(factura.company_id.fel_frase_ids[1].frase) == 4 and tipo != "NCRE":
                             frases_datos2 = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
-                            TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)                            
+                            TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
                     #frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
                     #logging.warning('FRASES 2')
                     #logging.warning(frases_datos2)
@@ -313,7 +313,7 @@ class AccountMove(models.Model):
                         TagDescuento = etree.SubElement(TagItem,DTE_NS+"Descuento",{})
                         TagDescuento.text =  str('{:.6f}'.format(descuento))
 
-                        if tipo != 'NABN':  
+                        if tipo != 'NABN':
                         # impuestos
                         #f tipo:
                             TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
@@ -361,7 +361,7 @@ class AccountMove(models.Model):
                                 TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
                                 TagMontoGravable.text = str(precio_subtotal)
                                 TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
-                                TagMontoImpuesto.text = "0.00" 
+                                TagMontoImpuesto.text = "0.00"
 
                         if (tipo in ['FACT','NCRE']) and factura.currency_id !=  factura.company_id.currency_id:
 
@@ -401,7 +401,7 @@ class AccountMove(models.Model):
                         TagTotalImpuestos.append(TagTotalImpuesto)
                     else:
                         dato_impuesto = {'NombreCorto': "IVA",'TotalMontoImpuesto': "0.00"}
-                        TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)   
+                        TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
 
                 TagGranTotal = etree.SubElement(TagTotales,DTE_NS+"GranTotal",{})
                 if tipo == 'FESP':
@@ -591,7 +591,7 @@ class AccountMove(models.Model):
                     'es_anulacion': 'N',
                     'archivo': xmls_base64.decode("utf-8")
                 }
-                
+
                 nuevos_headers = {"content-type": "application/json"}
                 response = requests.post(url, json = nuevo_json, headers = nuevos_headers)
 
@@ -607,7 +607,7 @@ class AccountMove(models.Model):
                             "IDENTIFICADOR": str(factura.journal_id.name)+'/'+str(factura.payment_reference) if factura.payment_reference else str(factura.journal_id.name)+'/'+str(factura.id),
                             "Content-Type": "application/json",
                         }
-                        
+
                         logging.warning('VALIDADO')
                         logging.warning(headers)
 
@@ -621,7 +621,7 @@ class AccountMove(models.Model):
                             "correo_copia": str(factura.company_id.email),
                             "xml_dte": respone_json["archivo"]
                         }
-                        
+
                         r = requests.post("https://certificador.feel.com.gt/fel/certificacion/v2/dte/", json=data, headers=headers)
                         retorno_certificacion_json = r.json()
                         logging.warn(retorno_certificacion_json)
