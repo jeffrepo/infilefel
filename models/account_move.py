@@ -91,6 +91,8 @@ class AccountMove(models.Model):
                 motivo_nc = ''
                 factura_original_id = False
                 if tipo == 'NCRE':
+                    logging.warning('split factura')
+                    logging.warning(factura.ref.split(':'))
                     factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()[0].replace(",", "")  )])
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                         tipo == 'NCRE'
