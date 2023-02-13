@@ -475,7 +475,8 @@ class AccountMove(models.Model):
                 if tipo == 'NCRE' or tipo == 'NABN':
                     logging.warning('--------------------------------------')
                     logging.warning(factura.ref.split(':')[1].split()[0].split(','))
-                    factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()  )])
+                    factura_original_str = factura.ref.split(':')[1].split()[0].split(',')[0]
+                    factura_original_id = self.env['account.move'].search([('name','=', factura_original_str )])
                     logging.warning('si es NC FACTURA ORIGIN')
                     logging.warning(factura_original_id)
                     logging.warning(motivo_nc)
