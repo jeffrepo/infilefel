@@ -479,7 +479,8 @@ class AccountMove(models.Model):
                         TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
                         cno = "{http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0}"
                         NSMAP_REF = {"cno": "http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0"}
-                        datos_complemento = {'IDComplemento': 'Notas', 'NombreComplemento':'Notas','URIComplemento':'text'}
+                        #datos_complemento = {'IDComplemento': 'Notas', 'NombreComplemento':'Notas','URIComplemento':'text'}
+                        datos_complemento = {'IDComplemento': 'ReferenciasNota', 'NombreComplemento':'Nota de Debito','URIComplemento':'text'}
                         TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
                         datos_referencias = {
                             'FechaEmisionDocumentoOrigen': str(factura_original_id.invoice_date),
