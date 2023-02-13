@@ -474,13 +474,15 @@ class AccountMove(models.Model):
 
                 if tipo == 'NCRE' or tipo == 'NABN':
                     factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()  )])
+                    logging.warning('si es NC FACTURA ORIGIN')
+                    logging.warning(factura_original_id)
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                         logging.warn('si')
                         TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
                         cno = "{http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0}"
                         NSMAP_REF = {"cno": "http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0"}
-                        #datos_complemento = {'IDComplemento': 'Notas', 'NombreComplemento':'Notas','URIComplemento':'text'}
-                        datos_complemento = {'IDComplemento': 'ReferenciasNota', 'NombreComplemento':'Nota de Debito','URIComplemento':'text'}
+                        datos_complemento = {'IDComplemento': 'Notas', 'NombreComplemento':'Notas','URIComplemento':'text'}
+                        #datos_complemento = {'IDComplemento': 'ReferenciasNota', 'NombreComplemento':'Nota de Debito','URIComplemento':'text'}
                         TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
                         datos_referencias = {
                             'FechaEmisionDocumentoOrigen': str(factura_original_id.invoice_date),
