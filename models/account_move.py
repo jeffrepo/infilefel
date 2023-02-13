@@ -473,10 +473,12 @@ class AccountMove(models.Model):
 
 
                 if tipo == 'NCRE' or tipo == 'NABN':
-                    logging.warning(factura.ref.split(':')[1].split())
+                    logging.warning('--------------------------------------')
+                    logging.warning(factura.ref.split(':')[1].split()[0].split(','))
                     factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()  )])
                     logging.warning('si es NC FACTURA ORIGIN')
                     logging.warning(factura_original_id)
+                    logging.warning(motivo_nc)
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                         logging.warn('si')
                         TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
