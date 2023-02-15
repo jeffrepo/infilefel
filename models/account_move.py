@@ -693,11 +693,18 @@ class AccountMove(models.Model):
                     "ID": "DatosAnulacion",
                     "NumeroDocumentoAAnular": str(factura.fel_numero_autorizacion),
                     "NITEmisor": str(nit_company),
-                    "IDReceptor": str(nit_partner),
                     "FechaEmisionDocumentoAnular": fecha_factura,
                     "FechaHoraAnulacion": fecha_anulacion,
                     "MotivoAnulacion": "Anulacion factura"
                 }
+                
+                #VERIFICAMOS SI SE FACTURA CON NIT O DPI
+                if factura.partner_id.documento_personal_identificacion == False:
+                    datos_generales['IDReceptor'] = str(nit_partner)
+                if (nit_partner == "CF" or nit_partner == "C/F") and factura.partner_id.documento_personal_identificacion:
+                    datos_generales['TipoEspecial'] = "CUI"
+                    datos_generales['IDReceptor'] = str(factura.partner_id.documento_personal_identificacion)
+                
                 if tipo == 'FACT' and (factura.currency_id.id !=  factura.company_id.currency_id.id):
                     datos_generales['IDReceptor'] = "CF"
                 TagDatosGenerales = etree.SubElement(TagAnulacionDTE,DTE_NS+"DatosGenerales",datos_generales)
