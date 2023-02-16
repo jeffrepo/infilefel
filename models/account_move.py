@@ -567,6 +567,8 @@ class AccountMove(models.Model):
                     factura._set_next_sequence()
                     TagAdenda = etree.SubElement(TagSAT,DTE_NS+"Adenda",{})
                     TagNint = etree.SubElement(TagAdenda,DTE_NS+"NInt",{})
+                    logging.warning('numero interno')
+                    logging.warning(factura.name)
                     TagNint.text = factura.name
                     exec(factura.company_id.adenda_extra)
                 # if factura.narration:
