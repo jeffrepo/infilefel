@@ -570,7 +570,8 @@ class AccountMove(models.Model):
                     logging.warning('numero interno')
                     logging.warning(factura.name)
                     TagNint.text = factura.name
-                    exec(factura.company_id.adenda_extra)
+                    if factura.company_id.adenda_extra:
+                        exec(factura.company_id.adenda_extra)
                 # if factura.narration:
                 #     TagAdenda = etree.SubElement(TagDTE, DTE_NS+"Adenda",{})
                 #     TagDECER = etree.SubElement(TagAdenda,"DECertificador",{})
