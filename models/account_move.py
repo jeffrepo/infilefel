@@ -315,7 +315,7 @@ class AccountMove(models.Model):
                         TagDescuento = etree.SubElement(TagItem,DTE_NS+"Descuento",{})
                         TagDescuento.text =  str('{:.6f}'.format(descuento))
 
-                        if tipo != 'NABN':
+                        if tipo != 'NABN' and linea.tax_ids:
                         # impuestos
                         #f tipo:
                             TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
@@ -365,7 +365,7 @@ class AccountMove(models.Model):
                                 TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
                                 TagMontoImpuesto.text = "0.00"
 
-                        if (tipo in ['FACT','NCRE']) and factura.currency_id !=  factura.company_id.currency_id:
+                        if (tipo in ['FACT','NCRE']) and factura.currency_id !=  factura.company_id.currency_id and len(linea.tax_ids) == 0:
 
                             TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
                             TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
