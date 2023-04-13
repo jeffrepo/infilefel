@@ -660,7 +660,7 @@ class AccountMove(models.Model):
 
     def button_draft(self):
         for factura in self:
-            if factura.fel_serie and factura.fel_numero and factura.fel_numero_autorizacion and factura.company_id.fel_llave_firma:
+            if factura.journal_id.fel_tipo_dte and factura.fel_serie and factura.fel_numero and factura.fel_numero_autorizacion and factura.company_id.fel_llave_firma:
                 attr_qname = etree.QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation")
                 DTE_NS = "{http://www.sat.gob.gt/dte/fel/0.1.0}"
                 # Nuevo SMAP
