@@ -471,14 +471,20 @@ class AccountMove(models.Model):
                         TagReferenciasNota = etree.SubElement(TagComplemento,cno+"ReferenciasNota",datos_referencias,nsmap=NSMAP_REF)
 
 
-
-                if tipo == 'NCRE' or tipo == 'NABN':
+                if tipo == 'NCRE':
                     logging.warning('--------------------------------------')
                     logging.warning(factura.ref.split(':')[1].split()[0].split(','))
+                    logging.warning(factura.ref.split(':')[1].split()[1])
                     factura_original_str = factura.ref.split(':')[1].split()[0].split(',')[0]
                     factura_original_id = self.env['account.move'].search([('name','=', factura_original_str )])
                     logging.warning('si es NC FACTURA ORIGIN')
                     logging.warning(factura_original_id)
+                    referencia_lista = factura.ref.split(':')[1].split()
+                    del referencia_lista[0]
+                    logging.warning('referencia lista')
+                    logging.warning(referencia_lista)
+                    motivo_nc = " ".join(referencia_lista)
+                    logging.warning('MOTIVO NC')
                     logging.warning(motivo_nc)
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                         logging.warn('si')
@@ -497,7 +503,6 @@ class AccountMove(models.Model):
                             'Version': '0.0'
                         }
                         TagReferenciasNota = etree.SubElement(TagComplemento,cno+"ReferenciasNota",datos_referencias,nsmap=NSMAP_REF)
-
 
                 if tipo == 'FCAM':
                     NSMAPFCAM = {
@@ -705,7 +710,7 @@ class AccountMove(models.Model):
                 if factura.partner_id.documento_personal_identificacion == False:
                     datos_generales['IDReceptor'] = str(nit_partner)
                 if (nit_partner == "CF" or nit_partner == "C/F") and factura.partner_id.documento_personal_identificacion:
-                    datos_generales['TipoEspecial'] = "CUI"
+                    #datos_generales['TipoEspecial'] = "CUI"
                     datos_generales['IDReceptor'] = str(factura.partner_id.documento_personal_identificacion)
                 
                 if tipo == 'FACT' and (factura.currency_id.id !=  factura.company_id.currency_id.id):
