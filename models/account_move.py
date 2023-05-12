@@ -320,7 +320,7 @@ class AccountMove(models.Model):
                         TagDescuento = etree.SubElement(TagItem,DTE_NS+"Descuento",{})
                         TagDescuento.text =  str('{:.6f}'.format(descuento))
 
-                        if tipo != 'NABN' and linea.tax_ids:
+                        if tipo != 'NABN':
                         # impuestos
                         #f tipo:
                             TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
@@ -328,10 +328,9 @@ class AccountMove(models.Model):
                             logging.warn('IMPUESTOS')
                             currency = linea.move_id.currency_id
                             logging.warn(precio_unitario)
-                            taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.move_id.partner_id)
-
-                            logging.warning(taxes)
-                            if len(taxes['taxes']) > 0:
+                            if linea.tax_ids:
+                                taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.move_id.partner_id)
+                                logging.warning(taxes)
                                 for impuesto in taxes['taxes']:
                                     #nombre_impuesto = impuesto['name']
                                     #valor_impuesto = impuesto['amount']
