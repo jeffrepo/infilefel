@@ -56,7 +56,23 @@ class AccountMove(models.Model):
                 linea_sin_impuesto = True
 
         return linea_sin_impuesto
-
+    
+    def obtener_numero_identificacion(self, partner_id):
+        nit_partner = {'id_receptor': "CF",'tipo_especial': False}
+        if partner_id.vat:
+            if '-' in partner_id.vat:
+                nit_partner['id_receptor'] = str(partner_id.vat.replace('-',''))
+            else:
+                nit_partner['id_receptor'] = str(partner_id.vat)
+        
+        if partner_id.documento_personal_identificacion == False:
+            nit_partner['id_receptor'] = "CF"
+            
+        if (nit_partner['id_receptor'] == "CF" or nit_partner['id_receptor'] == "C/F") and partner_id.documento_personal_identificacion:
+            nit_partner['id_receptor'] = str(partner_id.documento_personal_identificacion)
+            nit_partner['tipo_especial'] = "CUI"
+        return nit_partner
+    
     def _post(self,soft=True):
         for factura in self:
             if factura.fel_serie and factura.fel_numero_autorizacion and factura.journal_id.fel_tipo_dte:
@@ -129,31 +145,20 @@ class AccountMove(models.Model):
                     "NombreEmisor": factura.company_id.name or ""
                 }
 
-                nit_partner = "CF"
-                if factura.partner_id.vat:
-                    if '-' in factura.partner_id.vat:
-                        nit_partner = factura.partner_id.vat.replace('-','')
-                    else:
-                        nit_partner = factura.partner_id.vat
+                nit_partner = self.obtener_numero_identificacion(factura.partner_id)
 
                 if factura.amount_total > 2500:
-                    if (nit_partner == "CF" or nit_partner == "C/F") and factura.partner_id.documento_personal_identificacion == False:
+                    if (nit_partner['id_receptor'] == "CF" or nit_partner['id_receptor'] == "C/F") and factura.partner_id.documento_personal_identificacion == False:
                         raise UserError('EL cliente debe de tener NIT O DPI para poder emitir la factura')
-
 
                 datos_receptor = {
                     "CorreoReceptor": factura.partner_id.email or "",
-                    "NombreReceptor": factura.partner_id.name
+                    "NombreReceptor": factura.partner_id.name,
+                    "IDReceptor": nit_partner['id_receptor'],
                 }
-
-                #VERIFICAMOS SI SE FACTURA CON NIT O DPI
-                if factura.partner_id.documento_personal_identificacion == False:
-                    datos_receptor['IDReceptor'] = str(nit_partner)
-                if (nit_partner == "CF" or nit_partner == "C/F") and factura.partner_id.documento_personal_identificacion:
-                    datos_receptor['TipoEspecial'] = "CUI"
-                    datos_receptor['IDReceptor'] = str(factura.partner_id.documento_personal_identificacion)
-
-
+                
+                if nit_partner['tipo_especial'] != False:
+                    datos_receptor['TipoEspecial'] = nit_partner['tipo_especial']
 
                 if tipo == 'FACT' and factura.currency_id !=  factura.company_id.currency_id:
                     datos_receptor['IDReceptor'] = "CF"
@@ -680,16 +685,7 @@ class AccountMove(models.Model):
                 fecha_anulacion = datetime.datetime.strftime(fields.Datetime.context_timestamp(self, datetime.datetime.now()), "%Y-%m-%d")
                 hora_anulacion = datetime.datetime.strftime(fields.Datetime.context_timestamp(self, datetime.datetime.now()), "%H:%M:%S")
                 fecha_anulacion = str(fecha_anulacion)+'T'+str(hora_anulacion)
-                nit_partner = "CF"
-                if factura.partner_id.vat:
-                    logging.warn('si nit')
-                    if ('-' in factura.partner_id.vat):
-                        logging.warn('si nit if')
-                        nit_partner = factura.partner_id.vat.replace('-','')
-                    else:
-                        nit_partner = factura.partner_id.vat
-                        logging.warn('si nit else')
-
+                nit_partner = self.obtener_numero_identificacion(factura.partner_id)
 
                 nit_company = "CF"
                 if factura.journal_id.direccion_id.vat and ('-' in factura.journal_id.direccion_id.vat):
@@ -703,15 +699,12 @@ class AccountMove(models.Model):
                     "NITEmisor": str(nit_company),
                     "FechaEmisionDocumentoAnular": fecha_factura,
                     "FechaHoraAnulacion": fecha_anulacion,
-                    "MotivoAnulacion": "Anulacion factura"
+                    "MotivoAnulacion": "Anulacion factura",
+                    "IDReceptor": nit_partner["id_receptor"]
                 }
                 
-                #VERIFICAMOS SI SE FACTURA CON NIT O DPI
-                if factura.partner_id.documento_personal_identificacion == False:
-                    datos_generales['IDReceptor'] = str(nit_partner)
-                if (nit_partner == "CF" or nit_partner == "C/F") and factura.partner_id.documento_personal_identificacion:
-                    #datos_generales['TipoEspecial'] = "CUI"
-                    datos_generales['IDReceptor'] = str(factura.partner_id.documento_personal_identificacion)
+                if nit_partner["tipo_especial"] != False:
+                     datos_generales['TipoEspecial'] = nit_partner["tipo_especial"]
                 
                 if tipo == 'FACT' and (factura.currency_id.id !=  factura.company_id.currency_id.id):
                     datos_generales['IDReceptor'] = "CF"
