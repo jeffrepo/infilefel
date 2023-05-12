@@ -65,7 +65,7 @@ class AccountMove(models.Model):
             else:
                 nit_partner['id_receptor'] = str(partner_id.vat)
         
-        if partner_id.documento_personal_identificacion == False:
+        if partner_id.documento_personal_identificacion == False and (nit_partner['id_receptor']== "CF" or nit_partner['id_receptor']== "C/F"):
             nit_partner['id_receptor'] = "CF"
             
         if (nit_partner['id_receptor'] == "CF" or nit_partner['id_receptor'] == "C/F") and partner_id.documento_personal_identificacion:
@@ -148,7 +148,7 @@ class AccountMove(models.Model):
                 nit_partner = self.obtener_numero_identificacion(factura.partner_id)
 
                 if factura.amount_total > 2500:
-                    if (nit_partner['id_receptor'] == "CF" or nit_partner['id_receptor'] == "C/F") or factura.partner_id.documento_personal_identificacion == False:
+                    if (nit_partner['id_receptor'] == "CF" or nit_partner['id_receptor'] == "C/F") and factura.partner_id.documento_personal_identificacion == False:
                         raise UserError('EL cliente debe de tener NIT O DPI para poder emitir la factura')
 
                 datos_receptor = {
