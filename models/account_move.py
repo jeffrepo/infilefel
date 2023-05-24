@@ -14,7 +14,7 @@ import datetime
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    fel_numero_abonos_fc = fields.Integer('Número de abonos FCAM')
+    fel_numero_abonos_fc = fields.Integer('Número de abonos FCAM', default=1)
     fel_fecha_vencimiento_fc = fields.Date('Fecha vencimiento FCAM')
     fel_monto_abonos_fc = fields.Float('Monto de aboons FCAM')
     fel_numero_autorizacion = fields.Char('Número de autorización', copy=False, tracking=True)
@@ -56,7 +56,7 @@ class AccountMove(models.Model):
                 linea_sin_impuesto = True
 
         return linea_sin_impuesto
-    
+
     def obtener_numero_identificacion(self, partner_id):
         nit_partner = {'id_receptor': "CF",'tipo_especial': False}
         if partner_id.vat:
@@ -64,15 +64,15 @@ class AccountMove(models.Model):
                 nit_partner['id_receptor'] = str(partner_id.vat.replace('-',''))
             else:
                 nit_partner['id_receptor'] = str(partner_id.vat)
-        
+
         if partner_id.documento_personal_identificacion == False and (nit_partner['id_receptor']== "CF" or nit_partner['id_receptor']== "C/F"):
             nit_partner['id_receptor'] = "CF"
-            
+
         if (nit_partner['id_receptor'] == "CF" or nit_partner['id_receptor'] == "C/F") and partner_id.documento_personal_identificacion:
             nit_partner['id_receptor'] = str(partner_id.documento_personal_identificacion)
             nit_partner['tipo_especial'] = "CUI"
         return nit_partner
-    
+
     def _post(self,soft=True):
         for factura in self:
             if factura.fel_serie and factura.fel_numero_autorizacion and factura.journal_id.fel_tipo_dte:
@@ -100,13 +100,14 @@ class AccountMove(models.Model):
                 hora = datetime.datetime.strftime(fields.Datetime.context_timestamp(self, datetime.datetime.now()), "%H:%M:%S")
                 fecha_hora_emision = self.fecha_hora_factura(factura.invoice_date)
                 tipo = factura.journal_id.fel_tipo_dte
+                existe_complemento = False
                 # if tipo == 'FACT':
                 #
                 # if tipo == 'NDEB':
                 #
                 motivo_nc = ''
                 factura_original_id = False
-                if tipo == 'NCRE':
+                if tipo == 'NCRE' or tipo == 'NABN':
                     logging.warning('split factura')
                     logging.warning(factura.ref.split(':'))
                     factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()[0].replace(",", "")  )])
@@ -124,10 +125,8 @@ class AccountMove(models.Model):
                     "NumeroAcceso": str(100000000),
                     "Tipo":tipo
                     }
-                if tipo == 'FACT' and factura.tipo_factura == "exportacion":
+                if factura.journal_id.factura_exportacion:
                     datos_generales['Exp'] = "SI"
-
-
 
                 nit_company = "CF"
                 if '-' in factura.company_id.vat:
@@ -140,7 +139,6 @@ class AccountMove(models.Model):
                     "CodigoEstablecimiento": str(factura.journal_id.fel_codigo_establecimiento) or "",
                     "CorreoEmisor": str(factura.company_id.email) or "",
                     "NITEmisor": str(nit_company),
-                    # "NITEmisor": '103480307',
                     "NombreComercial": factura.journal_id.fel_nombre_comercial or "",
                     "NombreEmisor": factura.company_id.name or ""
                 }
@@ -156,11 +154,11 @@ class AccountMove(models.Model):
                     "NombreReceptor": factura.partner_id.name,
                     "IDReceptor": nit_partner['id_receptor'],
                 }
-                
+
                 if nit_partner['tipo_especial'] != False:
                     datos_receptor['TipoEspecial'] = nit_partner['tipo_especial']
 
-                if tipo == 'FACT' and factura.currency_id !=  factura.company_id.currency_id:
+                if tipo == 'FACT' and factura.journal_id.factura_exportacion:
                     datos_receptor['IDReceptor'] = "CF"
 
                 # Creamos los TAGS necesarios
@@ -197,14 +195,8 @@ class AccountMove(models.Model):
                 TagReceptorPais.text = "GT"
                 # Frases
 
-                data_frase = {
-                    "xmlns:dte": "http://www.sat.gob.gt/dte/fel/0.2.0"
-                }
-
-
-                NSMAPFRASE = {
-                    "dte": "http://www.sat.gob.gt/dte/fel/0.2.0"
-                }
+                data_frase = {"xmlns:dte": "http://www.sat.gob.gt/dte/fel/0.2.0"}
+                NSMAPFRASE = {"dte": "http://www.sat.gob.gt/dte/fel/0.2.0"}
 
                 lineas_sin_impuestos = self.verificar_lineas_sin_impuestos(factura.invoice_line_ids)
                 logging.warning('lineas_sin_impuestos')
@@ -381,6 +373,18 @@ class AccountMove(models.Model):
                             TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
                             TagMontoImpuesto.text = "0.00"
 
+                        if factura.journal_id.factura_exportacion:
+                            TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
+                            TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
+                            TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
+                            TagNombreCorto.text = "IVA"
+                            TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
+                            TagCodigoUnidadGravable.text = "2"
+                            TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
+                            TagMontoGravable.text = str(precio_subtotal)
+                            TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
+                            TagMontoImpuesto.text = "0.00"
+
 
                         #logging.warn(taxes)
                         TagTotal = etree.SubElement(TagItem,DTE_NS+"Total",{})
@@ -415,9 +419,9 @@ class AccountMove(models.Model):
                 else:
                     TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
 
-                if tipo == 'FACT' and factura.currency_id !=  factura.company_id.currency_id and factura.tipo_factura == "exportacion":
+                if factura.tipo_factura == "exportacion":
                     dato_impuesto = {'NombreCorto': "IVA",'TotalMontoImpuesto': str(0.00)}
-                    TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
+                    #TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
                     TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
                     datos_complementos = {
                         "IDComplemento": "EXPORTACION",
@@ -425,6 +429,7 @@ class AccountMove(models.Model):
                         "URIComplemento": "EXPORTACION"
                     }
                     TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complementos)
+                    existe_complemento = True
                     NSMAP = {
                         "cex": "http://www.sat.gob.gt/face2/ComplementoExportaciones/0.1.0"
                     }
@@ -454,12 +459,17 @@ class AccountMove(models.Model):
 
 
                 if tipo == 'NDEB':
-                    factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()  )])
+                    #ANTES
+                    #factura_original_id = self.env['account.move'].search([('name','=',factura.ref.split(':')[1].split()  )])
+                    #DESPUES
+                    factura_original_str = factura.ref.split(':')[1].split()[0].split(',')[0]
+                    factura_original_id = self.env['account.move'].search([('name','=', factura_original_str  )])
                     logging.warning('factura_original_id')
                     logging.warning(factura_original_id)
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                         logging.warn('si')
-                        TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
+                        if existe_complemento == False:
+                            TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
                         cno = "{http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0}"
                         NSMAP_REF = {"cno": "http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0"}
                         datos_complemento = {'IDComplemento': 'ReferenciasNota', 'NombreComplemento':'Nota de Debito','URIComplemento':'text'}
@@ -492,7 +502,8 @@ class AccountMove(models.Model):
                     logging.warning(motivo_nc)
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                         logging.warn('si')
-                        TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
+                        if existe_complemento == False:
+                            TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
                         cno = "{http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0}"
                         NSMAP_REF = {"cno": "http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0"}
                         datos_complemento = {'IDComplemento': 'Notas', 'NombreComplemento':'Notas','URIComplemento':'text'}
@@ -513,7 +524,9 @@ class AccountMove(models.Model):
                         "cfc": "http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0"
                     }
                     DTE_NS_CFCAM = "{http://www.sat.gob.gt/dte/fel/CompCambiaria/0.1.0}"
-                    TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
+                    if existe_complemento == False:
+                        TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
+                    #TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
                     datos_complemento = {'IDComplemento': 'Cambiaria', 'NombreComplemento':'Cambiaria','URIComplemento':'http://www.sat.gob.gt/fel/cambiaria.xsd'}
                     TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
                     tag_datos_factura_cambiaria = {
@@ -542,7 +555,8 @@ class AccountMove(models.Model):
                         "cfe": "http://www.sat.gob.gt/face2/ComplementoFacturaEspecial/0.1.0"
                     }
                     DTE_NS_CFC = "{http://www.sat.gob.gt/face2/ComplementoFacturaEspecial/0.1.0}"
-                    TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
+                    if existe_complemento == False:
+                        TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
                     #NSMAP_REF = {"cno": "http://www.sat.gob.gt/face2/ComplementoReferenciaNota/0.1.0"}
                     datos_complemento = {'IDComplemento': 'FacturaEspecial', 'NombreComplemento':'FacturaEspecial','URIComplemento':'http://www.sat.gob.gt/face2/ComplementoFacturaEspecial/0.1.0'}
                     TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
@@ -559,18 +573,18 @@ class AccountMove(models.Model):
                     TagTotalMenosRetenciones = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"TotalMenosRetenciones")
                     TagTotalMenosRetenciones.text = '{:.6f}'.format(factura.amount_total_signed*-1)
 
-                if factura.currency_id.id != factura.company_id.currency_id.id:
-                    TagAdenda = etree.SubElement(TagSAT,DTE_NS+"Adenda",{})
-                    if factura.comment:
-                        TagComentario = etree.SubElement(TagAdenda, DTE_NS+"Comentario",{})
-                        TagComentario.text = factura.comment
-                    if factura.currency_id.id != factura.company_id.currency_id.id:
-                        TagNitCliente = etree.SubElement(TagAdenda, DTE_NS+"NitCliente",{})
-                        if factura.partner_id.vat:
-                            if '-' in factura.partner_id.vat:
-                                TagNitCliente.text = factura.partner_id.vat.replace('-','')
-                            else:
-                                TagNitCliente.text = factura.partner_id.vat
+                # if factura.currency_id.id != factura.company_id.currency_id.id:
+                #     TagAdenda = etree.SubElement(TagSAT,DTE_NS+"Adenda",{})
+                #     if factura.comment:
+                #         TagComentario = etree.SubElement(TagAdenda, DTE_NS+"Comentario",{})
+                #         TagComentario.text = factura.comment
+                #     if factura.currency_id.id != factura.company_id.currency_id.id:
+                #         TagNitCliente = etree.SubElement(TagAdenda, DTE_NS+"NitCliente",{})
+                #         if factura.partner_id.vat:
+                #             if '-' in factura.partner_id.vat:
+                #                 TagNitCliente.text = factura.partner_id.vat.replace('-','')
+                #             else:
+                #                 TagNitCliente.text = factura.partner_id.vat
 
                 if tipo in ['FACT','NCRE','NDEB','NABN','FESP','FCAM']:
                     factura._set_next_sequence()
@@ -701,10 +715,10 @@ class AccountMove(models.Model):
                     "MotivoAnulacion": "Anulacion factura",
                     "IDReceptor": nit_partner["id_receptor"]
                 }
-                
+
                 if nit_partner["tipo_especial"] != False:
                      datos_generales['TipoEspecial'] = nit_partner["tipo_especial"]
-                
+
                 if tipo == 'FACT' and (factura.currency_id.id !=  factura.company_id.currency_id.id):
                     datos_generales['IDReceptor'] = "CF"
                 TagDatosGenerales = etree.SubElement(TagAnulacionDTE,DTE_NS+"DatosGenerales",datos_generales)
