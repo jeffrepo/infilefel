@@ -31,5 +31,6 @@ class AccountJournal(models.Model):
     producto_descripcion = fields.Boolean('Producto + descripcion')
     descripcion_factura = fields.Boolean('Descripcion factura')
     columna_extra_fel_py = fields.Text('Columna extra py linea')
+    factura_exportacion = fields.Boolean('Factura exportación')
     # direccion_sucursal = fields.Char('Dirección sucursal')
     # telefono = fields.Char('Teléfono')
