@@ -437,25 +437,27 @@ class AccountMove(models.Model):
 
                     TagExportacion = etree.SubElement(TagComplemento,cex+"Exportacion",{},Version="1",nsmap=NSMAP)
                     TagNombreConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"NombreConsignatarioODestinatario",{})
-                    TagNombreConsignatarioODestinatario.text = str(factura.partner_id.name)
+                    TagNombreConsignatarioODestinatario.text = str(factura.nombre_consignatario_destinatario) if factura.nombre_consignatario_destinatario else str(factura.partner_id.name)
                     TagDireccionConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"DireccionConsignatarioODestinatario",{})
-                    TagDireccionConsignatarioODestinatario.text = str(factura.company_id.street or "")+(" " + str(factura.company_id.street2) if factura.company_id.street2 else '' )
+                    direccion_consignatario = str(factura.partner_id.street) + (str(factura.partner_id.street2) if factura.partner_id.street2 else "")
+                    TagDireccionConsignatarioODestinatario.text = str(factura.direccion_consignatario_destinatario) if factura.direccion_consignatario_destinatario else direccion_consignatario
                     TagCodigoConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"CodigoConsignatarioODestinatario",{})
-                    TagCodigoConsignatarioODestinatario.text = str(factura.company_id.zip or "")
+                    TagCodigoConsignatarioODestinatario.text = str(factura.codigo_consignatario_destinatario)  if factura.codigo_consignatario_destinatario else ""
                     TagNombreComprador = etree.SubElement(TagExportacion,cex+"NombreComprador",{})
-                    TagNombreComprador.text = str(factura.partner_id.name)
+                    TagNombreComprador.text = str(factura.nombre_comprador) if factura.nombre_comprador else str(factura.partner_id.name)
+                    direccion_comprador = str(factura.partner_id.street) + (str(factura.partner_id.street2) if factura.partner_id.street2 else "")
                     TagDireccionComprador = etree.SubElement(TagExportacion,cex+"DireccionComprador",{})
-                    TagDireccionComprador.text = str(factura.company_id.street or "")+(" " + str(factura.company_id.street2) if factura.company_id.street2 else '' )
+                    TagDireccionComprador.text = str(factura.direccion_comprador) if factura.direccion_comprador else direccion_comprador
                     TagCodigoComprador = etree.SubElement(TagExportacion,cex+"CodigoComprador",{})
-                    TagCodigoComprador.text = str(factura.company_id.zip) if factura.company_id.zip else "N/A"
+                    TagCodigoComprador.text = str(factura.codigo_comprador) if factura.codigo_comprador else ""
                     TagOtraReferencia = etree.SubElement(TagExportacion,cex+"OtraReferencia",{})
-                    TagOtraReferencia.text = "N/A"
+                    TagOtraReferencia.text = str(factura.otra_referencia) if factura.otra_referencia else ""
                     TagINCOTERM = etree.SubElement(TagExportacion,cex+"INCOTERM",{})
-                    TagINCOTERM.text = str(factura.fel_incoterm)
+                    TagINCOTERM.text = str(factura.incoterm_exp) if factura.incoterm_exp else ""
                     TagNombreExportador = etree.SubElement(TagExportacion,cex+"NombreExportador",{})
-                    TagNombreExportador.text = str(factura.company_id.name)
+                    TagNombreExportador.text = str(factura.nombre_exportador) if factura.nombre_exportador else str(factura.company_id.name)
                     TagCodigoExportador = etree.SubElement(TagExportacion,cex+"CodigoExportador",{})
-                    TagCodigoExportador.text = factura.company_id.fel_codigo_exportador if factura.company_id.fel_codigo_exportador else "N/A"
+                    TagCodigoExportador.text = str(factura.codigo_exportador) if factura.codigo_exportador else ""
 
 
                 if tipo == 'NDEB':
