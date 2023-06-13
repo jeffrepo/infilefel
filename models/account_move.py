@@ -236,7 +236,6 @@ class AccountMove(models.Model):
                     #logging.warning(frases_datos2)
                     # TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
 
-
                 # LO CAMBIAMOS POR LO DE ARRIBA EL 27 DE JUNIO DEL 2022  linea 178
                 # if tipo not in  ['NDEB', 'NCRE','NABN','FESP']:
                 #     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
