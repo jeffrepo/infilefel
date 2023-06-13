@@ -281,7 +281,7 @@ class AccountMove(models.Model):
                         numero_linea += 1
                         TagItem =  etree.SubElement(TagItems,DTE_NS+"Item",linea_datos)
                         cantidad = linea.quantity
-                        unidad_medida = "UNI"
+                        unidad_medida = str(linea.product_uom_id.name) if factura.company_id.unidad_medida else "UNI"
                         descripcion = linea.product_id.name
                         if factura.journal_id.descripcion_factura:
                             descripcion = linea.name
