@@ -18,6 +18,7 @@
                             <field name="fel_numero_abonos_fc"/>
                             <field name="fel_monto_factura_fc"/>
                             <field name="fel_fecha_vencimiento_fc"/>
+                            <field name="unidad_medida"/>
                             <field name="adenda_extra"/>
                         </group>
                         <group string="Frases">
