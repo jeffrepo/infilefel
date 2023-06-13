@@ -26,4 +26,5 @@ class ResCompany(models.Model):
     fel_numero_abonos_fc = fields.Integer('Numero de abonos FCAM')
     fel_monto_factura_fc = fields.Boolean('Abono fijo por monto de FCAM')
     fel_fecha_vencimiento_fc = fields.Boolean('Fecha vencimiento factura para FCAM')
+    unidad_medida = fields.Boolean('Unidad de medida odoo')
     adenda_extra = fields.Text('Adenda extra')
