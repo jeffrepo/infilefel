@@ -418,7 +418,7 @@ class AccountMove(models.Model):
                 else:
                     TagGranTotal.text = '{:.6f}'.format(factura.currency_id.round(factura.amount_total))
 
-                if factura.tipo_factura == "exportacion":
+                if factura.journal_id.factura_exportacion:
                     dato_impuesto = {'NombreCorto': "IVA",'TotalMontoImpuesto': str(0.00)}
                     #TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
                     TagComplementos = etree.SubElement(TagDatosEmision,DTE_NS+"Complementos",{})
