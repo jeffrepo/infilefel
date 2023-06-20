@@ -350,7 +350,7 @@ class AccountMove(models.Model):
                                         # monto_gravable_iva += precio_subtotal
                                         # monto_impuesto_iva += valor_impuesto
                             else:
-                                if factura.journal_id.factura_exportacion === False:
+                                if factura.journal_id.factura_exportacion == False:
                                     TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
                                     TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
                                     TagNombreCorto.text = "IVA"
