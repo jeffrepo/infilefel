@@ -443,22 +443,22 @@ class AccountMove(models.Model):
                     direccion_consignatario = str(factura.partner_id.street) + (str(factura.partner_id.street2) if factura.partner_id.street2 else "")
                     TagDireccionConsignatarioODestinatario.text = str(factura.consignatario_destinatario_id.street) if factura.consignatario_destinatario_id else direccion_consignatario
                     TagCodigoConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"CodigoConsignatarioODestinatario",{})
-                    TagCodigoConsignatarioODestinatario.text = str(factura.consignatario_destinatario_id.ref)  if factura.consignatario_destinatario_id else "-"
+                    TagCodigoConsignatarioODestinatario.text = str(factura.consignatario_destinatario_id.ref)  if factura.consignatario_destinatario_id.ref else "-"
                     TagNombreComprador = etree.SubElement(TagExportacion,cex+"NombreComprador",{})
                     TagNombreComprador.text = str(factura.comprador_id.name) if factura.comprador_id else str(factura.partner_id.name)
                     direccion_comprador = str(factura.partner_id.street) + (str(factura.partner_id.street2) if factura.partner_id.street2 else "")
                     TagDireccionComprador = etree.SubElement(TagExportacion,cex+"DireccionComprador",{})
                     TagDireccionComprador.text = str(factura.direccion_comprador) if factura.direccion_comprador else direccion_comprador
                     TagCodigoComprador = etree.SubElement(TagExportacion,cex+"CodigoComprador",{})
-                    TagCodigoComprador.text = str(factura.comprador_id.ref) if factura.comprador_id else "-"
+                    TagCodigoComprador.text = str(factura.comprador_id.ref) if factura.comprador_id.ref else "-"
                     TagOtraReferencia = etree.SubElement(TagExportacion,cex+"OtraReferencia",{})
                     TagOtraReferencia.text = str(factura.otra_referencia) if factura.otra_referencia else str(factura.name)
-                    TagINCOTERM = etree.SubElement(TagExportacion,cex+"INCOTERM",{})
-                    TagINCOTERM.text = str(factura.incoterm_exp) if factura.incoterm_exp else ""
+                    #TagINCOTERM = etree.SubElement(TagExportacion,cex+"INCOTERM",{})
+                    #TagINCOTERM.text = str(factura.incoterm_exp) if factura.incoterm_exp else ""
                     TagNombreExportador = etree.SubElement(TagExportacion,cex+"NombreExportador",{})
                     TagNombreExportador.text = str(factura.exportador_id.name) if factura.exportador_id else ""
                     TagCodigoExportador = etree.SubElement(TagExportacion,cex+"CodigoExportador",{})
-                    TagCodigoExportador.text = str(factura.exportador_id.ref) if factura.exportador_id else "-"
+                    TagCodigoExportador.text = str(factura.exportador_id.ref) if factura.exportador_id.ref else "-"
 
 
                 if tipo == 'NDEB':
