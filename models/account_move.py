@@ -436,27 +436,27 @@ class AccountMove(models.Model):
 
                     TagExportacion = etree.SubElement(TagComplemento,cex+"Exportacion",{},Version="1",nsmap=NSMAP)
                     TagNombreConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"NombreConsignatarioODestinatario",{})
-                    TagNombreConsignatarioODestinatario.text = str(factura.nombre_consignatario_destinatario) if factura.nombre_consignatario_destinatario else str(factura.partner_id.name)
+                    TagNombreConsignatarioODestinatario.text = str(factura.consignatario_destinatario_id.name) if factura.consignatario_destinatario_id else str(factura.partner_id.name)
                     TagDireccionConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"DireccionConsignatarioODestinatario",{})
                     direccion_consignatario = str(factura.partner_id.street) + (str(factura.partner_id.street2) if factura.partner_id.street2 else "")
-                    TagDireccionConsignatarioODestinatario.text = str(factura.direccion_consignatario_destinatario) if factura.direccion_consignatario_destinatario else direccion_consignatario
+                    TagDireccionConsignatarioODestinatario.text = str(factura.consignatario_destinatario_id.street) if factura.consignatario_destinatario_id else direccion_consignatario
                     TagCodigoConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"CodigoConsignatarioODestinatario",{})
-                    TagCodigoConsignatarioODestinatario.text = str(factura.codigo_consignatario_destinatario)  if factura.codigo_consignatario_destinatario else ""
+                    TagCodigoConsignatarioODestinatario.text = str(factura.codigo_consignatario_destinatario.ref)  if factura.consignatario_destinatario_id else "-"
                     TagNombreComprador = etree.SubElement(TagExportacion,cex+"NombreComprador",{})
-                    TagNombreComprador.text = str(factura.nombre_comprador) if factura.nombre_comprador else str(factura.partner_id.name)
+                    TagNombreComprador.text = str(factura.comprador_id.name) if factura.comprador_id else str(factura.partner_id.name)
                     direccion_comprador = str(factura.partner_id.street) + (str(factura.partner_id.street2) if factura.partner_id.street2 else "")
                     TagDireccionComprador = etree.SubElement(TagExportacion,cex+"DireccionComprador",{})
                     TagDireccionComprador.text = str(factura.direccion_comprador) if factura.direccion_comprador else direccion_comprador
                     TagCodigoComprador = etree.SubElement(TagExportacion,cex+"CodigoComprador",{})
-                    TagCodigoComprador.text = str(factura.codigo_comprador) if factura.codigo_comprador else ""
+                    TagCodigoComprador.text = str(factura.comprador_id.ref) if factura.comprador_id else "-"
                     TagOtraReferencia = etree.SubElement(TagExportacion,cex+"OtraReferencia",{})
-                    TagOtraReferencia.text = str(factura.otra_referencia) if factura.otra_referencia else ""
+                    TagOtraReferencia.text = str(factura.otra_referencia) if factura.otra_referencia else str(factura.name)
                     TagINCOTERM = etree.SubElement(TagExportacion,cex+"INCOTERM",{})
                     TagINCOTERM.text = str(factura.incoterm_exp) if factura.incoterm_exp else ""
                     TagNombreExportador = etree.SubElement(TagExportacion,cex+"NombreExportador",{})
-                    TagNombreExportador.text = str(factura.nombre_exportador) if factura.nombre_exportador else str(factura.company_id.name)
+                    TagNombreExportador.text = str(factura.exportador_id.name) if factura.exportador_id else ""
                     TagCodigoExportador = etree.SubElement(TagExportacion,cex+"CodigoExportador",{})
-                    TagCodigoExportador.text = str(factura.codigo_exportador) if factura.codigo_exportador else ""
+                    TagCodigoExportador.text = str(factura.exportador_id.ref) if factura.exportador_id else "-"
 
 
                 if tipo == 'NDEB':
