@@ -441,7 +441,7 @@ class AccountMove(models.Model):
                     direccion_consignatario = str(factura.partner_id.street) + (str(factura.partner_id.street2) if factura.partner_id.street2 else "")
                     TagDireccionConsignatarioODestinatario.text = str(factura.consignatario_destinatario_id.street) if factura.consignatario_destinatario_id else direccion_consignatario
                     TagCodigoConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"CodigoConsignatarioODestinatario",{})
-                    TagCodigoConsignatarioODestinatario.text = str(factura.codigo_consignatario_destinatario.ref)  if factura.consignatario_destinatario_id else "-"
+                    TagCodigoConsignatarioODestinatario.text = str(factura.consignatario_destinatario_id.ref)  if factura.consignatario_destinatario_id else "-"
                     TagNombreComprador = etree.SubElement(TagExportacion,cex+"NombreComprador",{})
                     TagNombreComprador.text = str(factura.comprador_id.name) if factura.comprador_id else str(factura.partner_id.name)
                     direccion_comprador = str(factura.partner_id.street) + (str(factura.partner_id.street2) if factura.partner_id.street2 else "")
