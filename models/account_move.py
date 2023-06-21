@@ -158,8 +158,9 @@ class AccountMove(models.Model):
                 if nit_partner['tipo_especial'] != False:
                     datos_receptor['TipoEspecial'] = nit_partner['tipo_especial']
 
-                if tipo == 'FACT' and factura.journal_id.factura_exportacion:
+                if tipo in ['FACT','FCAM'] and factura.journal_id.factura_exportacion:
                     datos_receptor['IDReceptor'] = "CF"
+                    datos_receptor['TipoEspecial'] = "EXT"
 
                 # Creamos los TAGS necesarios
                 GTDocumento = etree.Element(DTE_NS+"GTDocumento", {attr_qname: 'http://www.sat.gob.gt/dte/fel/0.1.0'}, Version="0.1", nsmap=NSMAP)
