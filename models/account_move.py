@@ -159,7 +159,7 @@ class AccountMove(models.Model):
                     datos_receptor['TipoEspecial'] = nit_partner['tipo_especial']
 
                 if tipo in ['FACT','FCAM'] and factura.journal_id.factura_exportacion:
-                    datos_receptor['IDReceptor'] = "CF"
+                    datos_receptor['IDReceptor'] = nit_partner['id_receptor']
                     datos_receptor['TipoEspecial'] = "EXT"
 
                 # Creamos los TAGS necesarios
