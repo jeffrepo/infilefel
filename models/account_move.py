@@ -353,6 +353,7 @@ class AccountMove(models.Model):
                                         # monto_impuesto_iva += valor_impuesto
                             else:
                                 if factura.journal_id.factura_exportacion == False:
+                                    TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
                                     TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
                                     TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
                                     TagNombreCorto.text = "IVA"
@@ -364,7 +365,7 @@ class AccountMove(models.Model):
                                     TagMontoImpuesto.text = "0.00"
 
                         if (tipo in ['FACT','NCRE']) and factura.currency_id !=  factura.company_id.currency_id and len(linea.tax_ids) == 0:
-
+                            TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
                             TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
                             TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
                             TagNombreCorto.text = "IVA"
