@@ -592,7 +592,7 @@ class AccountMove(models.Model):
                 #                 TagNitCliente.text = factura.partner_id.vat
 
                 if tipo in ['FACT','NCRE','NDEB','NABN','FESP','FCAM']:
-                    #factura._set_next_sequence()
+                    factura._set_next_sequence()
                     TagAdenda = etree.SubElement(TagSAT,DTE_NS+"Adenda",{})
                     TagNint = etree.SubElement(TagAdenda,DTE_NS+"NInt",{})
                     logging.warning('numero interno')
