@@ -55,8 +55,8 @@ class AccountMove(models.Model):
             if len(linea.tax_ids) == 0:
                 linea_sin_impuesto = True
             else:
-                linea.tax_ids[0].amount <= 0:
-                linea_sin_impuesto = True
+                if linea.tax_ids[0].amount <= 0:
+                    linea_sin_impuesto = True
         return linea_sin_impuesto
 
     def obtener_numero_identificacion(self, partner_id):
