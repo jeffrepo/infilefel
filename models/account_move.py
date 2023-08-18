@@ -414,16 +414,21 @@ class AccountMove(models.Model):
                 #if tipo != 'NABN': nota de abono sin impuesto
                 if tipo != 'NABN':
                     TagTotalImpuestos = etree.SubElement(TagTotales,DTE_NS+"TotalImpuestos",{})
-
+                    logging.warning('lista impuestos')
+                    logging.warning(lista_impuestos)
                     if len(lista_impuestos) > 0:
-                        total_impuesto = 0
-                        logging.warn('EL IMPUESTO')
-                        for i in lista_impuestos:
-                            logging.warn(i)
-                            total_impuesto += float(i['monto'])
-                        dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.6f}'.format(total_impuesto))}
-                        TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
-                        TagTotalImpuestos.append(TagTotalImpuesto)
+                        if lista_impuestos[0]['monto'] <= 0:
+                            dato_impuesto = {'NombreCorto': "IVA",'TotalMontoImpuesto': "0.00"}
+                            TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
+                        else:
+                            total_impuesto = 0
+                            logging.warn('EL IMPUESTO')
+                            for i in lista_impuestos:
+                                logging.warn(i)
+                                total_impuesto += float(i['monto'])
+                            dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.6f}'.format(total_impuesto))}
+                            TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
+                            TagTotalImpuestos.append(TagTotalImpuesto)
                     else:
                         dato_impuesto = {'NombreCorto': "IVA",'TotalMontoImpuesto': "0.00"}
                         TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
