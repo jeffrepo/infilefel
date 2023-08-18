@@ -54,7 +54,9 @@ class AccountMove(models.Model):
         for linea in lineas:
             if len(linea.tax_ids) == 0:
                 linea_sin_impuesto = True
-
+            else:
+                linea.tax_ids[0].amount <= 0:
+                linea_sin_impuesto = True
         return linea_sin_impuesto
 
     def obtener_numero_identificacion(self, partner_id):
@@ -321,7 +323,7 @@ class AccountMove(models.Model):
                             currency = linea.move_id.currency_id
                             logging.warn(precio_unitario)
                             if linea.tax_ids:
-                                if linea.tax_ids.amount <= 0:
+                                if linea.tax_ids[0].amount <= 0:
                                     TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
                                     TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
                                     TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
