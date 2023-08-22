@@ -20,7 +20,6 @@ class AccountMove(models.Model):
     fel_numero_autorizacion = fields.Char('Número de autorización', copy=False, tracking=True)
     fel_serie = fields.Char('Serie', copy=False, tracking=True)
     fel_numero = fields.Char('Número', copy=False, tracking=True)
-    # fel_uuid = fields.Char('UUID')
     fel_documento_certificado = fields.Char('Documento Feel', copy=False, tracking=True)
     fel_incoterm = fields.Selection([
             ('EXW', 'En fábrica'),
