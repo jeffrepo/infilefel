@@ -290,7 +290,6 @@ class AccountMove(models.Model):
 
                         if tipo != 'NABN':
                             currency = linea.move_id.currency_id
-                            logging.warn(precio_unitario)
                             if linea.tax_ids:
                                 if linea.tax_ids[0].amount <= 0:
                                     TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
