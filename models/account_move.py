@@ -54,7 +54,9 @@ class AccountMove(models.Model):
         for linea in lineas:
             if len(linea.tax_ids) == 0:
                 linea_sin_impuesto = True
-
+            else:
+                if linea.tax_ids[0].amount <= 0:
+                    linea_sin_impuesto = True
         return linea_sin_impuesto
 
     def obtener_numero_identificacion(self, partner_id):
@@ -232,38 +234,12 @@ class AccountMove(models.Model):
                         if lineas_sin_impuestos == True and int(factura.company_id.fel_frase_ids[1].frase) == 4 and tipo != "NCRE":
                             frases_datos2 = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
                             TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
-                    #frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
-                    #logging.warning('FRASES 2')
-                    #logging.warning(frases_datos2)
-                    # TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
-
-                # LO CAMBIAMOS POR LO DE ARRIBA EL 27 DE JUNIO DEL 2022  linea 178
-                # if tipo not in  ['NDEB', 'NCRE','NABN','FESP']:
-                #     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
-                #     for linea_frase in factura.company_id.fel_frase_ids:
-                #         frases_datos = {}
-                #         if tipo == 'FACT' and factura.currency_id !=  factura.company_id.currency_id:
-                #             if linea_frase.frase:
-                #                 frases_datos = {"CodigoEscenario": linea_frase.codigo,"TipoFrase":linea_frase.frase}
-                #             else:
-                #                 frases_datos = {"CodigoEscenario": linea_frase.codigo}
-                #         if tipo == 'FACT' and factura.currency_id ==  factura.company_id.currency_id:
-                #             if int(linea_frase.frase) == 4:
-                #                 continue
-                #             else:
-                #                 frases_datos = {"CodigoEscenario": linea_frase.codigo,"TipoFrase":linea_frase.frase}
-                #
-                #         TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
-                #
-
 
                 # Items
                 TagItems = etree.SubElement(TagDatosEmision,DTE_NS+"Items",{})
 
                 impuestos_dic = {'IVA': 0}
                 tax_iva = False
-                # monto_gravable_iva = 0
-                # monto_impuesto_iva = 0
                 total_factura_general = 0
                 total_retencion_iva = 0
                 total_retencion_isr_fesp = 0
@@ -313,10 +289,6 @@ class AccountMove(models.Model):
                         TagDescuento.text =  str('{:.6f}'.format(descuento))
 
                         if tipo != 'NABN':
-                        # impuestos
-                        #f tipo:
-                            
-
                             logging.warn('IMPUESTOS')
                             currency = linea.move_id.currency_id
                             logging.warn(precio_unitario)
@@ -325,8 +297,6 @@ class AccountMove(models.Model):
                                 taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.move_id.partner_id)
                                 logging.warning(taxes)
                                 for impuesto in taxes['taxes']:
-                                    #nombre_impuesto = impuesto['name']
-                                    #valor_impuesto = impuesto['amount']
                                     if impuesto ['name'] == 'ISR Factura Especial':
                                         total_retencion_isr_fesp += impuesto['amount']
 
@@ -349,8 +319,7 @@ class AccountMove(models.Model):
                                         TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
                                         iva_fespecial += valor_impuesto
                                         total_retencion_iva += valor_impuesto
-                                        # monto_gravable_iva += precio_subtotal
-                                        # monto_impuesto_iva += valor_impuesto
+
                             else:
                                 if factura.journal_id.factura_exportacion == False:
                                     TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
@@ -388,15 +357,11 @@ class AccountMove(models.Model):
                             TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
                             TagMontoImpuesto.text = "0.00"
 
-
-                        #logging.warn(taxes)
                         TagTotal = etree.SubElement(TagItem,DTE_NS+"Total",{})
                         if tipo == 'FESP':
                              TagTotal.text = '{:.6f}'.format(linea.price_subtotal+iva_fespecial)
                         else:
                             TagTotal.text = '{:.6f}'.format(linea.price_total)
-                        # TagTotal.text =  str(linea.price_total)
-
 
                 TagTotales = etree.SubElement(TagDatosEmision,DTE_NS+"Totales",{})
                 #if tipo != 'NABN': nota de abono sin impuesto
@@ -405,9 +370,8 @@ class AccountMove(models.Model):
 
                     if len(lista_impuestos) > 0:
                         total_impuesto = 0
-                        logging.warn('EL IMPUESTO')
                         for i in lista_impuestos:
-                            logging.warn(i)
+                            logging.warning(i)
                             total_impuesto += float(i['monto'])
                         dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.6f}'.format(total_impuesto))}
                         TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
