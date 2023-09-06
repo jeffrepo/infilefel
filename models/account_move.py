@@ -378,17 +378,17 @@ class AccountMove(models.Model):
                                     TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
                                     TagMontoImpuesto.text = "0.00"
 
-                        if (tipo in ['FACT','NCRE']) and factura.currency_id !=  factura.company_id.currency_id and len(linea.tax_ids) == 0:
-                            TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
-                            TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
-                            TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
-                            TagNombreCorto.text = "IVA"
-                            TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
-                            TagCodigoUnidadGravable.text = "2"
-                            TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
-                            TagMontoGravable.text = str(precio_subtotal)
-                            TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
-                            TagMontoImpuesto.text = "0.00"
+                        # if (tipo in ['FACT','NCRE']) and factura.currency_id !=  factura.company_id.currency_id and len(linea.tax_ids) == 0:
+                        #     TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
+                        #     TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
+                        #     TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
+                        #     TagNombreCorto.text = "IVA"
+                        #     TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
+                        #     TagCodigoUnidadGravable.text = "2"
+                        #     TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
+                        #     TagMontoGravable.text = str(precio_subtotal)
+                        #     TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
+                        #     TagMontoImpuesto.text = "0.00"
 
                         if factura.journal_id.factura_exportacion:
                             TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
