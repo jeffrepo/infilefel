@@ -474,9 +474,9 @@ class AccountMove(models.Model):
                     TagCodigoComprador.text = str(factura.comprador_id.ref) if factura.comprador_id.ref else "-"
                     TagOtraReferencia = etree.SubElement(TagExportacion,cex+"OtraReferencia",{})
                     TagOtraReferencia.text = str(factura.otra_referencia) if factura.otra_referencia else str(factura.name)
-                    if factura.fel_incoterm:
+                    if factura.incoterm_exp:
                         TagINCOTERM = etree.SubElement(TagExportacion,cex+"INCOTERM",{})
-                        TagINCOTERM.text = str(factura.fel_incoterm) if factura.fel_incoterm else ""
+                        TagINCOTERM.text = str(factura.incoterm_exp) if factura.incoterm_exp else ""
                     TagNombreExportador = etree.SubElement(TagExportacion,cex+"NombreExportador",{})
                     TagNombreExportador.text = str(factura.exportador_id.name) if factura.exportador_id else ""
                     TagCodigoExportador = etree.SubElement(TagExportacion,cex+"CodigoExportador",{})
