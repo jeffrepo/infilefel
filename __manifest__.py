@@ -10,7 +10,7 @@
     'description': """
 
 """,
-    'depends': ['base','account'],
+    'depends': ['base','account','account_reports'],
     'data': [
         'views/account_view.xml',
         'views/res_company_views.xml',
