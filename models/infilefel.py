@@ -22,3 +22,8 @@ class InfileFelFrase(models.Model):
     company_id = fields.Many2one('res.company')
     codigo = fields.Char('Codigo')
     frase = fields.Char('Frase')
+
+class Partner(models.Model):
+    _inherit = "res.partner"
+
+    documento_personal_identificacion = fields.Char('DPI')

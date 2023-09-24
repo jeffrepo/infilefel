@@ -31,6 +31,38 @@
                     </div>
                 </t>
             </xpath>
+            <!-- <td t-attf-class="text-left {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))" id="line_tax_ids"/>
+            </td> -->
+            <!-- <span class="text-nowrap" t-field="line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/> -->
+
+            <!-- <tr class="border-black o_subtotal" style="">
+                <td><strong>Subtotal</strong></td>
+                <td class="text-right">
+                    <span t-field="o.amount_untaxed"/>
+                </td>
+            </tr> -->
+            <!-- <t t-foreach="o.amount_by_group" t-as="amount_by_group">
+                <tr style="">
+                    <t t-if="len(o.line_ids.filtered(lambda line: line.tax_line_id)) in [0, 1] and o.amount_untaxed == amount_by_group[2]">
+                        <td><span class="text-nowrap" t-esc="amount_by_group[0]"/></td>
+                        <td class="text-right o_price_total">
+                            <span class="text-nowrap" t-esc="amount_by_group[3]"/>
+                        </td>
+                    </t>
+                    <t t-else="">
+                        <td>
+                            <span t-esc="amount_by_group[0]"/>
+                            <span class="text-nowrap"> on
+                                <t t-esc="amount_by_group[4]"/>
+                            </span>
+                        </td>
+                        <td class="text-right o_price_total">
+                            <span class="text-nowrap" t-esc="amount_by_group[3]"/>
+                        </td>
+                    </t>
+                </tr>
+            </t>             -->
             <xpath expr="//p[@name='incoterm']" position="after">
                 <t t-if="o.fel_numero_autorizacion">
                     <div>
