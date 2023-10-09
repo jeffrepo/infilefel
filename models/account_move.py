@@ -711,16 +711,7 @@ class AccountMove(models.Model):
                 fecha_anulacion = datetime.datetime.strftime(fields.Datetime.context_timestamp(self, datetime.datetime.now()), "%Y-%m-%d")
                 hora_anulacion = datetime.datetime.strftime(fields.Datetime.context_timestamp(self, datetime.datetime.now()), "%H:%M:%S")
                 fecha_anulacion = str(fecha_anulacion)+'T'+str(hora_anulacion)
-                nit_partner = "CF"
-                if factura.partner_id.vat:
-                    logging.warn('si nit')
-                    if ('-' in factura.partner_id.vat):
-                        logging.warn('si nit if')
-                        nit_partner = factura.partner_id.vat.replace('-','')
-                    else:
-                        nit_partner = factura.partner_id.vat
-                        logging.warn('si nit else')
-
+                nit_partner = self.obtener_numero_identificacion(factura.partner_id)
 
                 nit_company = "CF"
                 if factura.journal_id.direccion_id.vat and ('-' in factura.journal_id.direccion_id.vat):
@@ -732,11 +723,12 @@ class AccountMove(models.Model):
                     "ID": "DatosAnulacion",
                     "NumeroDocumentoAAnular": str(factura.fel_numero_autorizacion),
                     "NITEmisor": str(nit_company),
-                    "IDReceptor": str(nit_partner),
                     "FechaEmisionDocumentoAnular": fecha_factura,
                     "FechaHoraAnulacion": fecha_anulacion,
-                    "MotivoAnulacion": "Anulacion factura"
+                    "MotivoAnulacion": "Anulacion factura",
+                    "IDReceptor": nit_partner["id_receptor"]
                 }
+
                 if tipo == 'FACT' and (factura.currency_id.id !=  factura.company_id.currency_id.id):
                     datos_generales['IDReceptor'] = "CF"
                 TagDatosGenerales = etree.SubElement(TagAnulacionDTE,DTE_NS+"DatosGenerales",datos_generales)
