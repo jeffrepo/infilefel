@@ -59,9 +59,11 @@ class AccountMove(models.Model):
         string="Intocerm exportación")
     nombre_exportador = fields.Char('Nombre exportador')
     codigo_exportador = fields.Char('Código exportador')
-
-
-
+    acuse_recibo_sat = fields.Char('Acuse Recibo SAT')
+    codigo_sat = fields.Char('Codigo SAT')
+    formato_xml = fields.Binary('XML Anulado')
+    formato_html = fields.Binary('HTML')
+    formato_pdf = fields.Binary('PDF')
 
 # 4 1 , exportacion
     def fecha_hora_factura(self, fecha):
