@@ -15,6 +15,7 @@
                                 <field name="fel_codigo_establecimiento"/>
                                 <field name="factura_exportacion"/>
                                 <field name="columna_extra_fel_py"/>
+                                <field name="frase_py"/>
                             </group>
                             <group>
                                 <field name="fel_nombre_comercial"/>
