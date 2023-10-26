@@ -207,14 +207,17 @@ class AccountMove(models.Model):
                 #segun fel Versión 1.7.3 no es necesaio frases ni codigos para FESP
                 if tipo == 'FESP' and len(factura.company_id.fel_frase_ids) > 1:
                     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
-                    logging.warning('LA FRASE')
-                    logging.warning(factura.company_id.fel_frase_ids[0].frase)
-                    frases_datos = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
-                    TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
-                    #frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
-                    #logging.warning('FRASES 2')
-                    #logging.warning(frases_datos2)
-                    #TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
+                    if factura.journal_id.frase_py:
+                       exec(factura.journal_id.frase_py)
+                    else:
+                        logging.warning('LA FRASE')
+                        logging.warning(factura.company_id.fel_frase_ids[0].frase)
+                        frases_datos = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
+                        TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
+                        #frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
+                        #logging.warning('FRASES 2')
+                        #logging.warning(frases_datos2)
+                        #TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
 
                 #validamos tipo de documento para saber que tipo de frases se agregan
                 #segun fel Versión 1.7.3 es necesario frase 2 y frase 1
@@ -234,6 +237,8 @@ class AccountMove(models.Model):
                         if lineas_sin_impuestos == True and int(factura.company_id.fel_frase_ids[1].frase) == 4 and tipo != "NCRE":
                             frases_datos2 = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
                             TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
+                    if factura.journal_id.frase_py:
+                       exec(factura.journal_id.frase_py)
                     #frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
                     #logging.warning('FRASES 2')
                     #logging.warning(frases_datos2)
