@@ -28,3 +28,6 @@ class AccountJournal(models.Model):
     fel_codigo_establecimiento = fields.Char('Codigo de establecimiento')
     fel_nombre_comercial = fields.Char('Nombre comercial')
     direccion_id = fields.Many2one('res.partner','Dirección')
+    direccion_sucursal = fields.Char('Dirección')
+    telefono = fields.Char('Teléfono')
+    encabezado_ticket = fields.Char('Encabezado ticket')
