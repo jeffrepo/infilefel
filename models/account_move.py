@@ -746,9 +746,6 @@ class AccountMove(models.Model):
                     "IDReceptor": nit_partner["id_receptor"]
                 }
 
-                if nit_partner["tipo_especial"] != False:
-                     datos_generales['TipoEspecial'] = nit_partner["tipo_especial"]
-
                 #if tipo == 'FACT' and (factura.currency_id.id !=  factura.company_id.currency_id.id):
                 #    datos_generales['IDReceptor'] = "CF"
                 TagDatosGenerales = etree.SubElement(TagAnulacionDTE,DTE_NS+"DatosGenerales",datos_generales)
