@@ -16,6 +16,9 @@
                             </group>
                             <group>
                                 <field name="fel_nombre_comercial"/>
+                                <field name="direccion_sucursal"/>
+                                <field name="telefono"/>
+                                <field name="encabezado_ticket"/>
                                 <field name="direccion_id"/>
                             </group>
                         </group>
