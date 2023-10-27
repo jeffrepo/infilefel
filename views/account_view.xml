@@ -22,6 +22,9 @@
                                 <field name="producto_descripcion"/>
                                 <field name="descripcion_factura"/>
                                 <!-- <field name="telefono"/> -->
+                                <field name="direccion_sucursal"/>
+                                <field name="telefono"/>
+                                <field name="encabezado_ticket"/>
                             </group>
                         </group>
                     </page>
