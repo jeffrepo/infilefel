@@ -205,7 +205,7 @@ class AccountMove(models.Model):
                 logging.warning('lineas_sin_impuestos')
                 logging.warning(lineas_sin_impuestos)
                 #segun fel Versión 1.7.3 no es necesaio frases ni codigos para FESP
-                if tipo == 'FESP' and len(factura.company_id.fel_frase_ids) > 1:
+                if tipo == 'FESP':
                     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
                     if factura.journal_id.frase_py:
                        exec(factura.journal_id.frase_py)
