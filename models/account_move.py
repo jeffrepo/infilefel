@@ -117,6 +117,9 @@ class AccountMove(models.Model):
                     "xsi": "http://www.w3.org/2001/XMLSchema-instance"
                 }
                 moneda = str(factura.currency_id.name)
+                if factura.invoice_date != True:
+                    factura.invoice_date = fields.Date.context_today(self)
+                
                 logging.warn(moneda)
                 fecha = datetime.datetime.strptime(str(factura.invoice_date), '%Y-%m-%d').date().strftime('%Y-%m-%d')
                 hora = datetime.datetime.strftime(fields.Datetime.context_timestamp(self, datetime.datetime.now()), "%H:%M:%S")
