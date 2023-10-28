@@ -169,7 +169,9 @@ class AccountMove(models.Model):
 
                 if factura.amount_total > 2500 and factura.journal_id.factura_exportacion == False:
                     if (nit_partner['id_receptor'] == "CF" or nit_partner['id_receptor'] == "C/F") and factura.partner_id.documento_personal_identificacion == False:
-                        raise UserError('EL cliente debe de tener NIT O DPI para poder emitir la factura')
+                        pedido = str(factura.pos_order_ids)
+                        cliente = str(factura.partner_id)
+                        raise UserError('EL cliente debe de tener NIT O DPI para poder emitir la factura pedido:' + pedido + ' cliente:' + cliente)
 
 
                 # nit_partner = "CF"
