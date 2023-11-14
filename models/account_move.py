@@ -153,7 +153,7 @@ class AccountMove(models.Model):
 
                 datos_receptor = {
                     "CorreoReceptor": factura.partner_id.email or "",
-                    "NombreReceptor": factura.partner_id.name,
+                    "NombreReceptor": factura.partner_id.parent_id.name if factura.partner_id.parent_id else factura.partner_id.name,
                     "IDReceptor": nit_partner['id_receptor'],
                 }
 
