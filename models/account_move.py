@@ -80,7 +80,7 @@ class AccountMove(models.Model):
             if factura.fel_serie and factura.fel_numero_autorizacion and factura.journal_id.fel_tipo_dte:
                 raise UserError(str('NO PUEDE VALIDAR FACTURA DE NUEVO POR QUE YA FUE CERTIFICADA UNA VEZ'))
 
-            if factura.journal_id and factura.journal_id.fel_tipo_dte:
+            if factura.journal_id and factura.journal_id.fel_tipo_dte and factura.move_type in ["out_invoice","out_refund","in_invoice","in_refund"]:
                 logging.warn(factura)
                 # Definimos SHEMALOCATION
                 lista_impuestos = []
