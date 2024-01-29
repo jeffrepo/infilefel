@@ -132,7 +132,7 @@ class AccountMove(models.Model):
                 # if tipo == 'NDEB':
                 #
                 if tipo == 'NCRE' or tipo == 'NABN':
-                    factura_original_id = self.env['account.invoice'].search([('number','=',factura.origin)])
+                    factura_original_id = self.env['account.move'].search([('number','=',factura.origin)])
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                         tipo == 'NCRE'
                         logging.warn('si es nota credito')
