@@ -221,7 +221,7 @@ class AccountMove(models.Model):
 
                 #validamos tipo de documento para saber que tipo de frases se agregan
                 #segun fel Versión 1.7.3 es necesario frase 2 y frase 1
-                if (tipo in ['FACT','NCRE','NDEB', 'FCAM']) and len(factura.company_id.fel_frase_ids) > 0:
+                if (tipo in ['FACT','NCRE','NDEB', 'FCAM']):
                     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
                     if factura.journal_id.frase_py:
                         exec(factura.journal_id.frase_py)
