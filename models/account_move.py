@@ -303,7 +303,7 @@ class AccountMove(models.Model):
                         descuento = ((linea.quantity * linea.price_unit) - linea.price_total) if linea.discount > 0 else 0
                         precio_subtotal = '{:.6f}'.format(linea.price_subtotal)
                         TagCantidad = etree.SubElement(TagItem,DTE_NS+"Cantidad",{})
-                        TagCantidad.text ='{:.2f}'.format(cantidad)
+                        TagCantidad.text ='{:.6f}'.format(cantidad)
                         # TagCantidad.text = str(cantidad)
                         TagUnidadMedida = etree.SubElement(TagItem,DTE_NS+"UnidadMedida",{})
                         TagUnidadMedida.text = str(unidad_medida)
