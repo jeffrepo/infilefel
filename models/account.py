@@ -35,3 +35,4 @@ class AccountJournal(models.Model):
     direccion_sucursal = fields.Char('Dirección')
     telefono = fields.Char('Teléfono')
     encabezado_ticket = fields.Char('Encabezado ticket')
+    frase_py = fields.Text('Frases')
