@@ -73,6 +73,9 @@ class AccountMove(models.Model):
         if (nit_partner['id_receptor'] == "CF" or nit_partner['id_receptor'] == "C/F") and partner_id.documento_personal_identificacion:
             nit_partner['id_receptor'] = str(partner_id.documento_personal_identificacion)
             nit_partner['tipo_especial'] = "CUI"
+        if partner_id.numero_documento_extranjero:
+            nit_partner['id_receptor'] = str(partner_id.numero_documento_extranjero)
+            nit_partner['tipo_especial'] = "EXT"
         return nit_partner
 
     def _post(self,soft=True):
