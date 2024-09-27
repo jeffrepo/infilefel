@@ -278,6 +278,8 @@ class AccountMove(models.Model):
                 total_factura_general = 0
                 total_retencion_iva = 0
                 total_retencion_isr_fesp = 0
+                logging.warning('total_retencion_isr_fesp 0')
+                logging.warning(total_retencion_isr_fesp)
                 total_retencion_isr = 0
                 for linea in factura.invoice_line_ids:
                     iva_fespecial = 0
@@ -352,7 +354,9 @@ class AccountMove(models.Model):
                                         #valor_impuesto = impuesto['amount']
                                         if impuesto ['name'] == 'ISR Factura Especial':
                                             total_retencion_isr_fesp += impuesto['amount']
-
+                                            logging.warning('sumando total_retencion_isr_fesp')
+                                            logging.warning(impuesto)
+                                            logging.warning(total_retencion_isr_fesp)
                                         if impuesto['name'] == 'IVA por Pagar' or impuesto['name'] == 'IVA por Cobrar':
                                             nombre_impuesto = impuesto['name']
                                             valor_impuesto = impuesto['amount']
@@ -601,6 +605,8 @@ class AccountMove(models.Model):
                     TagRetencionFacturaEspecial = etree.SubElement(TagComplemento,DTE_NS_CFC+"RetencionesFacturaEspecial",tag_datos_factura_especial,nsmap=NSMAPFRASECFC)
                     TagRetencionISR = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"RetencionISR")
                     # tomamos en cuenta IVA Factura Especial para total_retencion_iva
+                    logging.warning("TOTAL total_retencion_isr_fesp")
+                    logging.warning(total_retencion_isr_fesp)
                     TagRetencionISR.text = '{:.6f}'.format(total_retencion_isr_fesp*-1)
                     TagRetencionIVA = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"RetencionIVA")
                     TagRetencionIVA.text = '{:.6f}'.format(total_retencion_iva)
