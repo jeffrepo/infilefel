@@ -607,7 +607,7 @@ class AccountMove(models.Model):
                     # tomamos en cuenta IVA Factura Especial para total_retencion_iva
                     logging.warning("TOTAL total_retencion_isr_fesp")
                     logging.warning(total_retencion_isr_fesp)
-                    TagRetencionISR.text = '{:.6f}'.format(total_retencion_isr_fesp*-1)
+                    TagRetencionISR.text = '{:.6f}'.format(abs(total_retencion_isr_fesp))
                     TagRetencionIVA = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"RetencionIVA")
                     TagRetencionIVA.text = '{:.6f}'.format(total_retencion_iva)
                     TagTotalMenosRetenciones = etree.SubElement(TagRetencionFacturaEspecial,DTE_NS_CFC+"TotalMenosRetenciones")
