@@ -98,7 +98,7 @@ class AccountMove(models.Model):
                 }
 
                 if factura.invoice_date == False:
-                    factura.invoice_date = fields.Date.context_today(self)
+                    factura.invoice_date = fields.Date.context_today(self))
 
                 moneda = str(factura.currency_id.name)
                 fecha = datetime.datetime.strptime(str(factura.invoice_date), '%Y-%m-%d').date().strftime('%Y-%m-%d')
