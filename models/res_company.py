@@ -14,9 +14,9 @@ from odoo import api, fields, models, _
 class ResCompany(models.Model):
     _inherit = "res.company"
 
-    fel_usuario = fields.Char('Usuario feel')
-    fel_llave_pre_firma = fields.Char('Llave pre firma feel')
-    fel_llave_firma = fields.Char('Llave firma feel')
+    fel_usuario = fields.Char('Prefijo WS')
+    fel_llave_pre_firma = fields.Char('Token Signer')
+    fel_llave_firma = fields.Char('Llave WS')
     feel_frase = fields.Char('Tipo de frase Feel')
     fel_frase_ids = fields.One2many('infilefel.frase','company_id','Frases')
     fel_codigo_exportador = fields.Char('Codigo exportador')

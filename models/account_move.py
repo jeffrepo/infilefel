@@ -20,7 +20,6 @@ class AccountMove(models.Model):
     fel_numero_autorizacion = fields.Char('Número de autorización', copy=False, tracking=True)
     fel_serie = fields.Char('Serie', copy=False, tracking=True)
     fel_numero = fields.Char('Número', copy=False, tracking=True)
-    # fel_uuid = fields.Char('UUID')
     fel_documento_certificado = fields.Char('Documento Feel', copy=False, tracking=True)
     fel_incoterm = fields.Selection([
             ('EXW', 'En fábrica'),
@@ -41,7 +40,6 @@ class AccountMove(models.Model):
         string="Tipo de factura")
     fel_no_enviar_tel = fields.Boolean('No enviar telefono fel')
 
-# 4 1 , exportacion
     def fecha_hora_factura(self, fecha):
         fecha_convertida = datetime.datetime.strptime(str(fecha), '%Y-%m-%d').date().strftime('%Y-%m-%d')
         hora = datetime.datetime.strftime(fields.Datetime.context_timestamp(self, datetime.datetime.now()), "%H:%M:%S")
@@ -106,10 +104,7 @@ class AccountMove(models.Model):
                 fecha_hora_emision = self.fecha_hora_factura(factura.invoice_date)
                 tipo = factura.journal_id.fel_tipo_dte
                 existe_complemento = False
-                # if tipo == 'FACT':
-                #
-                # if tipo == 'NDEB':
-                #
+
                 motivo_nc = ''
                 factura_original_id = False
                 if tipo == 'NCRE' or tipo == 'NABN':
@@ -144,7 +139,7 @@ class AccountMove(models.Model):
                     "CodigoEstablecimiento": str(factura.journal_id.fel_codigo_establecimiento) or "",
                     "CorreoEmisor": str(factura.company_id.email) or "",
                     "NITEmisor": str(nit_company),
-                    "NombreComercial": factura.journal_id.fel_nombre_comercial or "",
+                    "NombreComercial": factura.journal_id.direccion_id.name or "",
                     "NombreEmisor": factura.company_id.name or ""
                 }
 
@@ -217,10 +212,6 @@ class AccountMove(models.Model):
                         logging.warning(factura.company_id.fel_frase_ids[0].frase)
                         frases_datos = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
                         TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
-                        #frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
-                        #logging.warning('FRASES 2')
-                        #logging.warning(frases_datos2)
-                        #TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
 
                 #validamos tipo de documento para saber que tipo de frases se agregan
                 #segun fel Versión 1.7.3 es necesario frase 2 y frase 1
@@ -243,30 +234,6 @@ class AccountMove(models.Model):
                             if lineas_sin_impuestos == True and int(factura.company_id.fel_frase_ids[1].frase) == 4 and tipo != "NCRE":
                                 frases_datos2 = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
                                 TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
-                    #frases_datos2 =  {"CodigoEscenario": "1","TipoFrase": "2"}
-                    #logging.warning('FRASES 2')
-                    #logging.warning(frases_datos2)
-                    # TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
-
-                # LO CAMBIAMOS POR LO DE ARRIBA EL 27 DE JUNIO DEL 2022  linea 178
-                # if tipo not in  ['NDEB', 'NCRE','NABN','FESP']:
-                #     TagFrases = etree.SubElement(TagDatosEmision,DTE_NS+"Frases", {},nsmap=NSMAPFRASE)
-                #     for linea_frase in factura.company_id.fel_frase_ids:
-                #         frases_datos = {}
-                #         if tipo == 'FACT' and factura.currency_id !=  factura.company_id.currency_id:
-                #             if linea_frase.frase:
-                #                 frases_datos = {"CodigoEscenario": linea_frase.codigo,"TipoFrase":linea_frase.frase}
-                #             else:
-                #                 frases_datos = {"CodigoEscenario": linea_frase.codigo}
-                #         if tipo == 'FACT' and factura.currency_id ==  factura.company_id.currency_id:
-                #             if int(linea_frase.frase) == 4:
-                #                 continue
-                #             else:
-                #                 frases_datos = {"CodigoEscenario": linea_frase.codigo,"TipoFrase":linea_frase.frase}
-                #
-                #         TagFrase = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos)
-                #
-
 
                 # Items
                 TagItems = etree.SubElement(TagDatosEmision,DTE_NS+"Items",{})
@@ -326,10 +293,6 @@ class AccountMove(models.Model):
                         TagDescuento.text =  str('{:.6f}'.format(descuento))
 
                         if tipo != 'NABN':
-                        # impuestos
-                        #f tipo:
-
-
                             logging.warn('IMPUESTOS')
                             currency = linea.move_id.currency_id
                             logging.warn(precio_unitario)
@@ -814,3 +777,4 @@ class AccountMove(models.Model):
                     raise UserError(str('ERROR AL ANULAR'))
 
         return super(AccountMove, self).button_draft()
+
