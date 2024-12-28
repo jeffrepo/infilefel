@@ -253,7 +253,7 @@ class AccountMove(models.Model):
                     if linea.product_id:
                         tax_ids = linea.tax_ids
                         numero_linea = 1
-                        bien_servicio = "S" if linea.product_id.type == 'service' else "B"
+                        bien_servicio = "S" if linea.product_id.detailed_type == 'service' else "B"
                         linea_datos = {
                             "BienOServicio": bien_servicio,
                             'NumeroLinea': str(numero_linea)
@@ -315,12 +315,14 @@ class AccountMove(models.Model):
                                     for impuesto in taxes['taxes']:
                                         #nombre_impuesto = impuesto['name']
                                         #valor_impuesto = impuesto['amount']
-                                        if impuesto ['name'] == 'ISR Factura Especial':
+                                        logging.warning("IMPUESTO ABC")
+                                        logging.warning(impuesto)
+                                        if impuesto['name'] == 'ISR Factura Especial':
                                             total_retencion_isr_fesp += impuesto['amount']
                                             logging.warning('sumando total_retencion_isr_fesp')
                                             logging.warning(impuesto)
                                             logging.warning(total_retencion_isr_fesp)
-                                        if impuesto['name'] == 'IVA por Pagar' or impuesto['name'] == 'IVA por Cobrar':
+                                        if impuesto['name'] == '12%' or impuesto['name'] == '12%':
                                             nombre_impuesto = impuesto['name']
                                             valor_impuesto = impuesto['amount']
                                             nombre_impuesto = "IVA"
@@ -677,7 +679,6 @@ class AccountMove(models.Model):
                     raise UserError(str(respone_json))
 
         return super(AccountMove, self)._post()
-
 
 
     def button_draft(self):
