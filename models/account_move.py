@@ -104,6 +104,8 @@ class AccountMove(models.Model):
                 raise UserError(str('NO PUEDE VALIDAR FACTURA DE NUEVO POR QUE YA FUE CERTIFICADA UNA VEZ'))
 
             if factura.journal_id and factura.journal_id.fel_tipo_dte and factura.partner_id:
+                timbre = False
+                impuesto_timbre = 0
                 logging.warn(factura)
                 # Definimos SHEMALOCATION
                 lista_impuestos = []
@@ -335,7 +337,10 @@ class AccountMove(models.Model):
                             logging.warn(precio_unitario)
 
                             if linea.tax_ids:
-                                if linea.tax_ids[0].amount <= 0:
+                                taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.move_id.partner_id)
+                                logging.warning("los taxes")
+                                logging.warning(taxes)
+                                if taxes["taxes"][0]["amount"] <= 0:
                                     TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
                                     TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
                                     TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
@@ -346,11 +351,25 @@ class AccountMove(models.Model):
                                     TagMontoGravable.text = str(precio_subtotal)
                                     TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
                                     TagMontoImpuesto.text = "0.00"
+
+                                    for imp in taxes["taxes"]:
+                                        if imp["amount"] > 0:
+                                            TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
+                                            TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
+                                            TagNombreCorto.text = imp["name"]
+                                            TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
+                                            TagCodigoUnidadGravable.text = "1"
+                                            TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
+                                            TagMontoGravable.text = str(imp["base"])
+                                            TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
+                                            TagMontoImpuesto.text = str(imp["amount"])
+                                            timbre = True
+                                            impuesto_timbre += imp["amount"]
                                 else:
                                     TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
 
                                     taxes = tax_ids.compute_all(precio_unitario-(descuento/linea.quantity), currency, linea.quantity, linea.product_id, linea.move_id.partner_id)
-
+                                    logging.warning(taxes)
                                     for impuesto in taxes['taxes']:
 
                                         if impuesto ['name'] == 'ISR Factura Especial':
@@ -450,6 +469,9 @@ class AccountMove(models.Model):
                     else:
                         dato_impuesto = {'NombreCorto': "IVA",'TotalMontoImpuesto': "0.00"}
                         TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
+                        if timbre:
+                            impuesto_timbre_d = {'NombreCorto': "TIMBRE DE PRENSA",'TotalMontoImpuesto': str(impuesto_timbre)}
+                            TagTotalImpuesto2 = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",impuesto_timbre_d)
 
                 TagGranTotal = etree.SubElement(TagTotales,DTE_NS+"GranTotal",{})
                 if tipo == 'FESP':
