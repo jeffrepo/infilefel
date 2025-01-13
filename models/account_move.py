@@ -253,7 +253,7 @@ class AccountMove(models.Model):
                     if linea.product_id:
                         tax_ids = linea.tax_ids
                         numero_linea = 1
-                        bien_servicio = "S" if linea.product_id.detailed_type == 'service' else "B"
+                        bien_servicio = "S" if linea.product_id.type == 'service' else "B"
                         linea_datos = {
                             "BienOServicio": bien_servicio,
                             'NumeroLinea': str(numero_linea)
