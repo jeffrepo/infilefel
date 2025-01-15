@@ -394,6 +394,25 @@ class AccountMove(models.Model):
 
                                             lista_impuestos.append({'nombre': nombre_impuesto, 'monto': valor_impuesto})
 
+                                        if impuesto['name'] == 'TIMBRE DE PRENSA':
+                                            timbre = True
+                                            impuesto_timbre += impuesto["amount"]
+
+                                            nombre_impuesto = impuesto['name']
+                                            valor_impuesto = impuesto['amount']
+
+                                            TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
+                                            TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
+                                            TagNombreCorto.text = nombre_impuesto
+                                            TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
+                                            TagCodigoUnidadGravable.text = "1"
+                                            TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
+                                            TagMontoGravable.text = str(precio_subtotal)
+                                            TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
+                                            TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
+
+                                            lista_impuestos.append({'nombre': nombre_impuesto, 'monto': valor_impuesto})
+
                             else:
                                 if factura.journal_id.factura_exportacion == False:
                                     TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
@@ -462,10 +481,15 @@ class AccountMove(models.Model):
                             logging.warn('EL IMPUESTO')
                             for i in lista_impuestos:
                                 logging.warn(i)
-                                total_impuesto += float(i['monto'])
+                                if i['nombre'] != "TIMBRE DE PRENSA":
+                                    total_impuesto += float(i['monto'])
                             dato_impuesto = {'NombreCorto': lista_impuestos[0]['nombre'],'TotalMontoImpuesto': str('{:.6f}'.format(total_impuesto))}
                             TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
                             TagTotalImpuestos.append(TagTotalImpuesto)
+                        
+                        if timbre:
+                            impuesto_timbre_d = {'NombreCorto': "TIMBRE DE PRENSA",'TotalMontoImpuesto': str(impuesto_timbre)}
+                            TagTotalImpuesto2 = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",impuesto_timbre_d)
                     else:
                         dato_impuesto = {'NombreCorto': "IVA",'TotalMontoImpuesto': "0.00"}
                         TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
