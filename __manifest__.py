@@ -13,7 +13,7 @@
     'depends': ['base','account','account_reports'],
     'data': [
         'views/account_view.xml',
-        'views/res_company_views.xml',
+        #'views/res_company_views.xml',
         'views/account_move_views.xml',
         #'views/report_invoice.xml',
         #'views/res_partner_view.xml',
