@@ -427,7 +427,7 @@ class AccountMove(models.Model):
                                     TagMontoImpuesto.text = "0.00"
 
 
-                        if factura.journal_id.factura_exportacion:
+                        if factura.journal_id.factura_exportacion and timbre == False:
                             TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
                             TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
                             TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
