@@ -488,13 +488,13 @@ class AccountMove(models.Model):
                             TagTotalImpuestos.append(TagTotalImpuesto)
                         
                         if timbre:
-                            impuesto_timbre_d = {'NombreCorto': "TIMBRE DE PRENSA",'TotalMontoImpuesto': str(impuesto_timbre)}
+                            impuesto_timbre_d = {'NombreCorto': "TIMBRE DE PRENSA",'TotalMontoImpuesto': str('{:.6f}'.format(impuesto_timbre))}
                             TagTotalImpuesto2 = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",impuesto_timbre_d)
                     else:
                         dato_impuesto = {'NombreCorto': "IVA",'TotalMontoImpuesto': "0.00"}
                         TagTotalImpuesto = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",dato_impuesto)
                         if timbre:
-                            impuesto_timbre_d = {'NombreCorto': "TIMBRE DE PRENSA",'TotalMontoImpuesto': str(impuesto_timbre)}
+                            impuesto_timbre_d = {'NombreCorto': "TIMBRE DE PRENSA",'TotalMontoImpuesto': str('{:.6f}'.format(impuesto_timbre))}
                             TagTotalImpuesto2 = etree.SubElement(TagTotalImpuestos,DTE_NS+"TotalImpuesto",impuesto_timbre_d)
 
                 TagGranTotal = etree.SubElement(TagTotales,DTE_NS+"GranTotal",{})
