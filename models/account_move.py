@@ -322,7 +322,7 @@ class AccountMove(models.Model):
                                             logging.warning('sumando total_retencion_isr_fesp')
                                             logging.warning(impuesto)
                                             logging.warning(total_retencion_isr_fesp)
-                                        if impuesto['name'] == '12%' or impuesto['name'] == '12%':
+                                        if impuesto['name'] == '12%' or impuesto['name'] == '12%' or impuesto['name'] == 'IVA POR PAGAR':
                                             nombre_impuesto = impuesto['name']
                                             valor_impuesto = impuesto['amount']
                                             nombre_impuesto = "IVA"
