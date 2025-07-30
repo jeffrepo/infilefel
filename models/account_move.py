@@ -322,7 +322,7 @@ class AccountMove(models.Model):
                                             logging.warning('sumando total_retencion_isr_fesp')
                                             logging.warning(impuesto)
                                             logging.warning(total_retencion_isr_fesp)
-                                        if impuesto['name'] == '12%' or impuesto['name'] == '12%' or impuesto['name'] == 'IVA POR PAGAR':
+                                        if impuesto['name'] == '12%' or impuesto['name'] == 'IVA por Pagar' or impuesto['name'] == 'IVA POR PAGAR' or impuesto['name'] == 'IVA por Cobrar':
                                             nombre_impuesto = impuesto['name']
                                             valor_impuesto = impuesto['amount']
                                             nombre_impuesto = "IVA"
@@ -469,6 +469,24 @@ class AccountMove(models.Model):
                     factura_original_id = self.env['account.move'].search([('name','=', factura_original_str  )])
                     logging.warning('factura_original_id')
                     logging.warning(factura_original_id)
+
+
+
+                    logging.warning('--------------------------------------')
+                    logging.warning(factura.ref.split(':')[1].split()[0].split(','))
+                    logging.warning(factura.ref.split(':')[1].split()[1])
+                    factura_original_str = factura.ref.split(':')[1].split()[0].split(',')[0]
+                    factura_original_id = self.env['account.move'].search([('name','=', factura_original_str )])
+                    logging.warning('si es NC FACTURA ORIGIN')
+                    logging.warning(factura_original_id)
+                    referencia_lista = factura.ref.split(':')[1].split()
+                    del referencia_lista[0]
+                    logging.warning('referencia lista')
+                    logging.warning(referencia_lista)
+                    motivo_nc = " ".join(referencia_lista)
+                    logging.warning('MOTIVO NC')
+                    logging.warning(motivo_nc)
+                    
                     if factura_original_id and factura.currency_id.id == factura_original_id.currency_id.id:
                         logging.warn('si')
                         if existe_complemento == False:
@@ -479,7 +497,7 @@ class AccountMove(models.Model):
                         TagComplemento = etree.SubElement(TagComplementos,DTE_NS+"Complemento",datos_complemento)
                         datos_referencias = {
                             'FechaEmisionDocumentoOrigen': str(factura_original_id.invoice_date),
-                            'MotivoAjuste': 'Anulación',
+                            'MotivoAjuste': motivo_nc,
                             'NumeroAutorizacionDocumentoOrigen': str(factura_original_id.fel_numero_autorizacion),
                             'NumeroDocumentoOrigen': str(factura_original_id.fel_numero),
                             'SerieDocumentoOrigen': str(factura_original_id.fel_serie),
@@ -778,4 +796,3 @@ class AccountMove(models.Model):
                     raise UserError(str('ERROR AL ANULAR'))
 
         return super(AccountMove, self).button_draft()
-
