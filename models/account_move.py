@@ -388,8 +388,95 @@ class AccountMove(models.Model):
                         else:
                             TagTotal.text = '{:.6f}'.format(linea.price_total)
                         # TagTotal.text =  str(linea.price_total)
+                    #si no tiene producto, es un anticipo por una SO
+                    else:
+                        tax_ids = linea.tax_ids
+                        numero_linea = 1
+                        bien_servicio = "S"
+                        linea_datos = {
+                            "BienOServicio": bien_servicio,
+                            'NumeroLinea': str(numero_linea)
+                        }
+                        numero_linea += 1
+                        TagItem =  etree.SubElement(TagItems,DTE_NS+"Item",linea_datos)
+                        cantidad = linea.quantity
+                        unidad_medida = "UNI"
+                        descripcion = linea.product_id.name
+                        if factura.journal_id.descripcion_factura:
+                            descripcion = linea.name
+                        if factura.journal_id.producto_descripcion:
+                            descripcion = str(linea.product_id.name) + ' ' +str(linea.name)
+
+                        # precio_unitario = (linea.price_unit * (1 - (linea.discount) / 100.0)) if linea.discount > 0 else linea.price_unit
+                        precio_unitario = linea.price_unit
+                        precio = linea.price_unit * linea.quantity
+                        total_factura_general += precio
+                        descuento = ((linea.quantity * linea.price_unit) - linea.price_total) if linea.discount > 0 else 0
+                        precio_subtotal = '{:.6f}'.format(linea.price_subtotal)
+                        TagCantidad = etree.SubElement(TagItem,DTE_NS+"Cantidad",{})
+                        TagCantidad.text ='{:.6f}'.format(cantidad)
+                        # TagCantidad.text = str(cantidad)
+                        TagUnidadMedida = etree.SubElement(TagItem,DTE_NS+"UnidadMedida",{})
+                        TagUnidadMedida.text = str(unidad_medida)
+                        TagDescripcion = etree.SubElement(TagItem,DTE_NS+"Descripcion",{})
+                        if factura.journal_id.columna_extra_fel_py:
+                            exec(factura.journal_id.columna_extra_fel_py)
+                        else:
+                            TagDescripcion.text = (str(linea.product_id.name) +'|'+ str(linea.product_id.default_code)) if linea.product_id.default_code else descripcion
+                        TagPrecioUnitario = etree.SubElement(TagItem,DTE_NS+"PrecioUnitario",{})
+                        TagPrecioUnitario.text = '{:.6f}'.format(precio_unitario)
+                        TagPrecio = etree.SubElement(TagItem,DTE_NS+"Precio",{})
+                        TagPrecio.text =  '{:.6f}'.format(precio)
+                        TagDescuento = etree.SubElement(TagItem,DTE_NS+"Descuento",{})
+                        TagDescuento.text =  str('{:.6f}'.format(descuento))
+
+                        if tipo != 'NABN':
+                            currency = linea.move_id.currency_id
+                            if linea.tax_ids:
+                                if linea.tax_ids[0].amount <= 0:
+                                    TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
+                                    TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
+                                    TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
+                                    TagNombreCorto.text = "IVA"
+                                    TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
+                                    TagCodigoUnidadGravable.text = "2"
+                                    TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
+                                    TagMontoGravable.text = str(precio_subtotal)
+                                    TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
+                                    TagMontoImpuesto.text = "0.00"
+                                else:
+                                    TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
+                                    nombre_impuesto = 'IVA por Cobrar'
+                                    valor_impuesto = linea.price_total - linea.price_subtotal
+                                    nombre_impuesto = "IVA"
+                                    tax_iva = True
+                                    lista_impuestos.append({'nombre': nombre_impuesto, 'monto': valor_impuesto})
+                                    TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
+                                    TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
+                                    TagNombreCorto.text = nombre_impuesto
+                                    TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
+                                    TagCodigoUnidadGravable.text = "1"
+                                    TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
+                                    TagMontoGravable.text = str(precio_subtotal)
+                                    TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
+                                    TagMontoImpuesto.text = '{:.6f}'.format(valor_impuesto)
+                            else:
+                                if factura.journal_id.factura_exportacion == False:
+                                    TagImpuestos = etree.SubElement(TagItem,DTE_NS+"Impuestos",{})
+                                    TagImpuesto = etree.SubElement(TagImpuestos,DTE_NS+"Impuesto",{})
+                                    TagNombreCorto = etree.SubElement(TagImpuesto,DTE_NS+"NombreCorto",{})
+                                    TagNombreCorto.text = "IVA"
+                                    TagCodigoUnidadGravable = etree.SubElement(TagImpuesto,DTE_NS+"CodigoUnidadGravable",{})
+                                    TagCodigoUnidadGravable.text = "2"
+                                    TagMontoGravable = etree.SubElement(TagImpuesto,DTE_NS+"MontoGravable",{})
+                                    TagMontoGravable.text = str(precio_subtotal)
+                                    TagMontoImpuesto = etree.SubElement(TagImpuesto,DTE_NS+"MontoImpuesto",{})
+                                    TagMontoImpuesto.text = "0.00"
 
 
+                        TagTotal = etree.SubElement(TagItem,DTE_NS+"Total",{})
+                        TagTotal.text = '{:.6f}'.format(linea.price_total)
+                        
                 TagTotales = etree.SubElement(TagDatosEmision,DTE_NS+"Totales",{})
                 #if tipo != 'NABN': nota de abono sin impuesto
                 if tipo != 'NABN':
