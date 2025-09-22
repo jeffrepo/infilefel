@@ -194,11 +194,11 @@ class AccountMove(models.Model):
                 TagReceptorCodigoPostal = etree.SubElement(TagDireccionReceptor,DTE_NS+"CodigoPostal",{})
                 TagReceptorCodigoPostal.text = factura.partner_id.zip or '01001'
                 TagReceptorMunicipio = etree.SubElement(TagDireccionReceptor,DTE_NS+"Municipio",{})
-                #TagReceptorMunicipio.text = factura.partner_id.city or 'Guatemala'
-                TagReceptorMunicipio.text = factura.partner_id.city or ' '
+                TagReceptorMunicipio.text = factura.partner_id.city or 'Guatemala'
+                #TagReceptorMunicipio.text = factura.partner_id.city or ' '
                 TagReceptorDepartamento = etree.SubElement(TagDireccionReceptor,DTE_NS+"Departamento",{})
-                #TagReceptorDepartamento.text = factura.partner_id.state_id.name or 'Guatemala'
-                TagReceptorDepartamento.text = factura.partner_id.state_id.name or ' '
+                TagReceptorDepartamento.text = factura.partner_id.state_id.name or 'Guatemala'
+                #TagReceptorDepartamento.text = factura.partner_id.state_id.name or ' '
                 TagReceptorPais = etree.SubElement(TagDireccionReceptor,DTE_NS+"Pais",{})
                 TagReceptorPais.text = "GT"
                 # Frases
