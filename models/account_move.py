@@ -10,6 +10,7 @@ from lxml import etree
 from lxml.builder import ElementMaker
 import xml.etree.ElementTree as ET
 import datetime
+import re
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -473,6 +474,8 @@ class AccountMove(models.Model):
                     cex = "{http://www.sat.gob.gt/face2/ComplementoExportaciones/0.1.0}"
 
                     TagExportacion = etree.SubElement(TagComplemento,cex+"Exportacion",{},Version="1",nsmap=NSMAP)
+                    TagLugarExpedicion = etree.SubElement(TagExportacion,cex+"LugarExpedicion",{})
+                    TagLugarExpedicion.text = factura.lugar_expedicion
                     TagNombreConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"NombreConsignatarioODestinatario",{})
                     TagNombreConsignatarioODestinatario.text = str(factura.consignatario_destinatario_id.name) if factura.consignatario_destinatario_id else str(factura.partner_id.name)
                     TagDireccionConsignatarioODestinatario = etree.SubElement(TagExportacion,cex+"DireccionConsignatarioODestinatario",{})
