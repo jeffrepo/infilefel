@@ -14,17 +14,17 @@ from odoo import api, fields, models, _
 class ResCompany(models.Model):
     _inherit = "res.company"
 
-    fel_usuario = fields.Char('Prefijo WS')
-    fel_llave_pre_firma = fields.Char('Token Signer')
-    fel_llave_firma = fields.Char('Llave WS')
+    fel_usuario = fields.Char('Usuario feel')
+    fel_llave_pre_firma = fields.Char('Llave pre firma feel')
+    fel_llave_firma = fields.Char('Llave firma feel')
     feel_frase = fields.Char('Tipo de frase Feel')
     fel_frase_ids = fields.One2many('infilefel.frase','company_id','Frases')
-    fel_codigo_exportador = fields.Char('Codigo exportador')
+    feel_codigo_exportador = fields.Char('Codigo exportador')
     certificador = fields.Char('Certificador', default="INFILE")
     fel_logo = fields.Binary('Logo fel')
     fel_texto_logo = fields.Char('Texto logo fel')
-    fel_numero_abonos_fc = fields.Integer('Numero de abonos FCAM')
-    fel_monto_factura_fc = fields.Boolean('Abono fijo por monto de FCAM')
-    fel_fecha_vencimiento_fc = fields.Boolean('Fecha vencimiento factura para FCAM')
-    unidad_medida = fields.Boolean('Unidad de medida odoo')
-    adenda_extra = fields.Text('Adenda extra')
+
+    # feel_codigo_establecimiento = fields.Char('Codigo de establecimiento')
+
+    codigo = fields.Char(string="Código", copy=False)
+    frase = fields.Char(string="Frase", copy=False)

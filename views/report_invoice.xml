@@ -31,7 +31,7 @@
                     </div>
                 </t>
             </xpath>
-            <xpath expr="//p[@name='incoterm']" position="after">
+            <!-- <xpath expr="//p[@name='incoterm']" position="after">
                 <t t-if="o.fel_numero_autorizacion">
                     <div>
                         <strong>Total:</strong> <span t-esc="o.currency_id.amount_to_text(o.amount_total)"/>
@@ -54,7 +54,7 @@
                           "/></center>
                     </div>
                 </t>
-            </xpath>
+            </xpath> -->
         </template>
 
 
