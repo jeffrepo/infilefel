@@ -28,3 +28,4 @@ class ResCompany(models.Model):
     fel_fecha_vencimiento_fc = fields.Boolean('Fecha vencimiento factura para FCAM')
     unidad_medida = fields.Boolean('Unidad de medida odoo')
     adenda_extra = fields.Text('Adenda extra')
+    feel_codigo_exportador = fields.Char("codigo exportador")
