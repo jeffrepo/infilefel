@@ -33,5 +33,6 @@ class AccountJournal(models.Model):
     columna_extra_fel_py = fields.Text('Columna extra py linea')
     factura_exportacion = fields.Boolean('Factura exportación')
     frase_py = fields.Text('Frases')
+    factura_exportacion = fields.Boolean('Factura de exportacion')
     # direccion_sucursal = fields.Char('Dirección sucursal')
     # telefono = fields.Char('Teléfono')
