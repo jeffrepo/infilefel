@@ -10,6 +10,7 @@ from lxml import etree
 from lxml.builder import ElementMaker
 import xml.etree.ElementTree as ET
 import datetime
+import re
 
 class AccountMove(models.Model):
     _inherit = "account.move"
