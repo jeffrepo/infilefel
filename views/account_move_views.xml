@@ -11,7 +11,7 @@
                   <field name="fel_serie" readonly="state in ('posted','cancel')"/>
                   <field name="fel_numero" readonly="state in ('posted','cancel')"/>
                   <field name="fel_numero_autorizacion" readonly="state in ('posted','cancel')"/>
-                  <field name="fel_documento_certificado" readonly="1" attrs="{'readonly': [('state', 'not in', ('posted','cancel'))]}"/>
+                  <field name="fel_documento_certificado" readonly="state in ('posted','cancel')"/>
               </group>
               <field name="invoice_user_id" position="after">
                   <field name="tipo_factura"/>
