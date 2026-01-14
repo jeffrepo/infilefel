@@ -11,7 +11,13 @@
                   <field name="fel_serie" readonly="state in ('posted','cancel')"/>
                   <field name="fel_numero" readonly="state in ('posted','cancel')"/>
                   <field name="fel_numero_autorizacion" readonly="state in ('posted','cancel')"/>
-                  <field name="fel_documento_certificado" readonly="state in ('posted','cancel')"/>
+                  <!-- <field name="fel_documento_certificado" readonly="1" widget="url"/> -->
+                  <button class="oe_link"
+                    type="object"
+                    name="action_open_fel_certificado"
+                    string="Ver certificado FEL"
+                    style="padding: 0; vertical-align: baseline;"
+                    invisible = "fel_documento_certificado == False"/>
               </group>
               <field name="invoice_user_id" position="after">
                   <field name="tipo_factura"/>
