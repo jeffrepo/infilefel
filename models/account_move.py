@@ -41,6 +41,16 @@ class AccountMove(models.Model):
         string="Tipo de factura")
     fel_no_enviar_tel = fields.Boolean('No enviar telefono fel')
 
+    def action_open_fel_certificado(self):
+        self.ensure_one()
+        if not self.fel_documento_certificado:
+            return False
+        return {
+            "type": "ir.actions.act_url",
+            "url": self.fel_documento_certificado,
+            "target": "new",
+        }
+    
     def fecha_hora_factura(self, fecha):
         fecha_convertida = datetime.datetime.strptime(str(fecha), '%Y-%m-%d').date().strftime('%Y-%m-%d')
         hora = datetime.datetime.strftime(fields.Datetime.context_timestamp(self, datetime.datetime.now()), "%H:%M:%S")
