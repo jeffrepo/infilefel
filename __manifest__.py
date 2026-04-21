@@ -20,7 +20,7 @@
         #'views/report_invoice.xml',
         'views/reporte_ticket.xml',
         'data/paperformat_ticket.xml',
-        'views/report.xml',
+        #'views/report.xml',
         'security/ir.model.access.csv',
     ],
     'installable': True,
