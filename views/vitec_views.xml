@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_company_infile_vitec" model="ir.ui.view">
+        <field name="name">res.company.infile.vitec</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="l10n_xma_einvoice_gtm.view_res_company_form_inherit_gt"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='fel_info']" position="attributes">
+                <attribute name="string">INFILE directo</attribute>
+            </xpath>
+            <xpath expr="//field[@name='xma_api_key']" position="attributes">
+                <attribute name="password">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='xma_token_signer']" position="attributes">
+                <attribute name="password">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='xma_api_url']" position="replace">
+                <field name="infile_vitec_sign_url" widget="url"/>
+                <field name="infile_vitec_certify_url" widget="url"/>
+                <field name="infile_vitec_cancel_url" widget="url"/>
+            </xpath>
+            <xpath expr="//field[@name='l10n_xma_phrase_ids']" position="after">
+                <div class="text-muted">
+                    Se conserva la selección de frases de Vitec. El XML y el diagnóstico
+                    de cada solicitud muestran los TipoFrase y CodigoEscenario enviados.
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_move_infile_vitec" model="ir.ui.view">
+        <field name="name">account.move.infile.vitec</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="INFILE directo" name="infile_vitec">
+                    <group>
+                        <group>
+                            <field name="infile_vitec_state"/>
+                            <field name="infile_vitec_operation"/>
+                            <field name="infile_vitec_identifier"/>
+                        </group>
+                        <group>
+                            <field name="infile_vitec_emission"/>
+                            <field name="infile_vitec_request_name" invisible="1"/>
+                            <field name="infile_vitec_request_xml" filename="infile_vitec_request_name"/>
+                            <field name="infile_vitec_certified_name" invisible="1"/>
+                            <field name="infile_vitec_certified_xml" filename="infile_vitec_certified_name"/>
+                        </group>
+                    </group>
+                    <field name="infile_vitec_diagnostic" nolabel="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_payment_infile_vitec" model="ir.ui.view">
+        <field name="name">account.payment.infile.vitec</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="l10n_xma_einvoice_gtm.view_account_payment_form_inherit_gtm"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="INFILE directo" name="infile_vitec">
+                    <group>
+                        <field name="infile_vitec_state"/>
+                        <field name="infile_vitec_operation"/>
+                        <field name="infile_vitec_identifier"/>
+                        <field name="infile_vitec_emission"/>
+                        <field name="infile_vitec_request_name" invisible="1"/>
+                        <field name="infile_vitec_request_xml" filename="infile_vitec_request_name"/>
+                        <field name="infile_vitec_certified_name" invisible="1"/>
+                        <field name="infile_vitec_certified_xml" filename="infile_vitec_certified_name"/>
+                    </group>
+                    <field name="infile_vitec_diagnostic" nolabel="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
