@@ -1,3 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_infile_frase_usuario,infile.frase.usuario,infilefel.model_infilefel_frase,account.group_account_invoice,1,0,0,0
 access_infile_frase_admin,infile.frase.admin,infilefel.model_infilefel_frase,account.group_account_manager,1,1,1,1
+access_infile_frase_extra_usuario,infile.frase.extra.usuario,model_infilefel_frase_extra,account.group_account_invoice,1,0,0,0
+access_infile_frase_extra_lectura,infile.frase.extra.lectura,model_infilefel_frase_extra,account.group_account_readonly,1,0,0,0
+access_infile_frase_extra_admin,infile.frase.extra.admin,model_infilefel_frase_extra,account.group_account_manager,1,1,1,1
