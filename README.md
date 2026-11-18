@@ -1,6 +1,6 @@
 # INFILE FEL — Odoo 18
 
-Versión `18.0.1.1.0`, basada en la rama `18.0` de
+Versión `18.0.1.1.1`, basada en la rama `18.0` de
 [jeffrepo/infilefel](https://github.com/jeffrepo/infilefel/tree/18.0), revisión
 `6285af1ba643cc6ad5d2f505993beb3aadcb37e8`.
 
@@ -64,11 +64,23 @@ La actualización crea la tabla `infilefel_frase_extra`, la relación con
 `account.move`, las vistas, las reglas y los permisos. No requiere migrar
 las frases que ya están configuradas en el diario o la compañía.
 
+Esta versión corrige la carga de `views/report.xml` en Odoo 18: el ticket
+se declara mediante `ir.actions.report`, conservando el identificador
+`infilefel_ticket`, la plantilla, el formato de papel y la opción de impresión.
+
 Se ejecutaron ocho pruebas locales de la lógica real de generación del XML,
 incluyendo el código de ejemplo del diario, frases adicionales, deduplicación,
 configuración de compañía, aislamiento entre facturas y orden de los nodos.
 También se verificaron sintaxis Python/XML, archivos del manifiesto, permisos
 declarados y el punto de inserción de las etiquetas en la vista oficial de Odoo 18.
+
+Los ocho XML cargados por el manifiesto también se validaron con el esquema
+oficial `odoo/import_xml.rng` de Odoo 18. Puede repetir esta comprobación sin
+una base de datos, indicando la ruta al esquema de su instalación:
+
+```bash
+python3 scripts/check_xml_schema.py --schema /home/odoo/src/odoo/odoo/import_xml.rng
+```
 
 Se incluyen pruebas de integración en `tests/test_fel_frases.py` para permisos,
 selección por usuarios de facturación, compañías, bloqueo de facturas y archivo.
