@@ -4,3 +4,4 @@ from . import account
 from . import account_move
 from . import res_company
 from . import infilefel
+from . import infilefel_frase_extra

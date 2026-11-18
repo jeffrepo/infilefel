@@ -40,6 +40,53 @@ class AccountMove(models.Model):
     tipo_factura = fields.Selection([('venta','Venta'),('compra', 'Compra o Bien'), ('servicio', 'Servicio'),('varios','Varios'), ('combustible', 'Combustible'),('importacion', 'Importación'),('exportacion','Exportación')],
         string="Tipo de factura")
     fel_no_enviar_tel = fields.Boolean('No enviar telefono fel')
+    fel_frase_extra_ids = fields.Many2many(
+        'infilefel.frase.extra',
+        'account_move_infilefel_frase_extra_rel', 'move_id', 'frase_id',
+        string='Frases FEL adicionales', check_company=True, copy=True,
+        help='Se agregan al XML FEL además de las frases del diario o la compañía.',
+    )
+
+    @api.constrains('fel_frase_extra_ids')
+    def _check_fel_frases_editables(self):
+        for move in self:
+            if move.fel_frase_extra_ids and (
+                move.state != 'draft' or move.fel_numero_autorizacion
+            ):
+                raise UserError(_(
+                    'Las frases FEL adicionales solo se pueden cambiar en '
+                    'facturas en borrador que todavía no estén certificadas.'
+                ))
+
+    def write(self, vals):
+        if 'fel_frase_extra_ids' in vals:
+            for move in self:
+                if move.state != 'draft' or move.fel_numero_autorizacion:
+                    raise UserError(_(
+                        'Las frases FEL adicionales solo se pueden cambiar en '
+                        'facturas en borrador que todavía no estén certificadas.'
+                    ))
+        return super().write(vals)
+
+    def _fel_agregar_frases_adicionales(self, datos_emision, dte_ns):
+        """Append invoice phrases to the existing XML without repeating pairs."""
+        self.ensure_one()
+        if not self.fel_frase_extra_ids:
+            return
+        tag_frases = datos_emision.find(dte_ns + 'Frases')
+        if tag_frases is None:
+            tag_frases = etree.SubElement(datos_emision, dte_ns + 'Frases')
+        existentes = {
+            (frase.get('CodigoEscenario'), frase.get('TipoFrase'))
+            for frase in tag_frases.findall(dte_ns + 'Frase')
+        }
+        for frase in self.fel_frase_extra_ids.sorted('id'):
+            pareja = (str(frase.codigo_escenario), str(frase.tipo_frase))
+            if pareja not in existentes:
+                etree.SubElement(tag_frases, dte_ns + 'Frase', {
+                    'CodigoEscenario': pareja[0], 'TipoFrase': pareja[1],
+                })
+                existentes.add(pareja)
 
     def fecha_hora_factura(self, fecha):
         fecha_convertida = datetime.datetime.strptime(str(fecha), '%Y-%m-%d').date().strftime('%Y-%m-%d')
@@ -235,6 +282,8 @@ class AccountMove(models.Model):
                             if lineas_sin_impuestos == True and int(factura.company_id.fel_frase_ids[1].frase) == 4 and tipo != "NCRE":
                                 frases_datos2 = {"CodigoEscenario": factura.company_id.fel_frase_ids[1].codigo,"TipoFrase":factura.company_id.fel_frase_ids[1].frase}
                                 TagFrase2 = etree.SubElement(TagFrases,DTE_NS+"Frase",frases_datos2)
+
+                factura._fel_agregar_frases_adicionales(TagDatosEmision, DTE_NS)
 
                 # Items
                 TagItems = etree.SubElement(TagDatosEmision,DTE_NS+"Items",{})
